@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"><meta name="theme-color" content="#2f8fd0"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
-<script>window.KW_APP=1;window.KW_BUILD={"v": "73", "t": "13.11.2026, 13:55 Uhr"};</script>
+<script>window.KW_ARCHIV_LIST=[{"v": "70", "t": "13.11.2026, 13:10 Uhr", "txt": "Sicht vom ganzen Rumpf"}, {"v": "71", "t": "13.11.2026, 13:28 Uhr", "txt": "Reiter Freizeit, Vollbild-Hinweis behoben"}, {"v": "72", "t": "13.11.2026, 13:46 Uhr", "txt": "8 berühmte Schiffe, Wracks auf der Karte"}, {"v": "73", "t": "13.11.2026, 13:55 Uhr", "txt": "Polarstern, Reiter Technik, Hubschrauber"}, {"v": "74", "t": "13.11.2026, 14:03 Uhr", "txt": "Ältere Versionen im Elternbereich"}];window.KW_APP=1;window.KW_BUILD={"v": "74", "t": "13.11.2026, 14:03 Uhr"};</script>
 <title>Kleine Werft</title>
 <style>@font-face{font-family:"Fredoka";src:url("fonts/Fredoka.ttf") format("truetype");font-weight:300 700;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype");font-weight:700;font-display:swap}</style>
 <style>
@@ -462,7 +462,7 @@ function hornOff(){if(!hornNodes)return;const {g,os}=hornNodes;g.gain.linearRamp
 const NOTE_IDX={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
 function nf(n){if(n==='R')return 0;const m=n.match(/^([A-G](?:#|b)?)(\d)$/);return m?440*Math.pow(2,(NOTE_IDX[m[1]]+12*(+m[2]+1)-69)/12):0;}
 // ---------------- Version & Update-Stand (Startbildschirm unten links, Elternbereich) ----------------
-/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "73", "t": "13.11.2026, 13:55 Uhr", "test": 1};/*KW_BUILD_END*/
+/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "74", "t": "13.11.2026, 14:01 Uhr", "test": 1};/*KW_BUILD_END*/
 const UPD={state:null,v:null,pct:0};
 function verText(){const B=window.KW_BUILD||{};let s=(B.test?'Test · ':'')+'Version '+B.v+(B.t?' · '+B.t:'');
   if(UPD.state==='first')s+=' · Offline-Speicher ⬇ '+UPD.pct+' %';else if(UPD.state==='firstdone')s+=' · offline bereit ✓';
@@ -3052,6 +3052,7 @@ function openParents(back){
     <div class="prow"><span><b>Spielstand</b><br><small>${ownedCount()} von ${allStickers().length} Stickern · ${visited.size} von ${world?world.harbors.length:0} Häfen</small></span><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="pbtn" id="pSave">Sichern</button><label class="pbtn alt" for="pLoad">Laden</label><input type="file" id="pLoad" accept=".json,application/json" hidden><button class="pbtn danger" id="pReset">Zurücksetzen</button></span></div>
     <div class="prow"><span><b>Karte</b><br><small>${MAP&&MAP.stamp?'Veröffentlicht am '+new Date(MAP.stamp).toLocaleString('de-DE'):'Standardkarte'}</small></span><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="pbtn alt" id="pFetch">Neue Karte holen</button><button class="pbtn alt" id="pEditor">Karten-Editor</button></span></div>
     <div class="prow"><span><b>App-Version</b><br><small id="pVerC">${verParents().cur}</small><br><small id="pVerU">${verParents().u}</small></span></div>
+    <div class="prow"><span><b>Ältere Versionen</b><br><small>${window.KW_ARCHIV?'Du spielst gerade eine ältere Version.':window.KW_APP?'Frühere Versionen ausprobieren (nur mit Internet). Spielstände dort sind getrennt.':'Nur in der App verfügbar.'}</small></span><span style="display:flex;gap:8px;flex-wrap:wrap">${window.KW_ARCHIV?'<button class="pbtn alt" id="pArchBack">Aktuelle Version</button>':(window.KW_APP&&window.KW_ARCHIV_LIST)?'<button class="pbtn alt" id="pArch">Ältere Versionen</button>':''}</span></div>
     <div class="pmsg" id="pMsg" role="status"></div><div id="pDump"></div></div></div>`;
   $('#mClose').onclick=()=>{closeModal();if(back&&!document.querySelector('#modalRoot .modal'))back();};
   $('#pMusic').onchange=e=>{save.music=e.target.checked;persist();if(save.music)musicStart();else musicStop();};
@@ -3069,7 +3070,16 @@ function openParents(back){
       if(!d.design)throw 0;LS.set(SAVE_KEY,d);location.reload();}catch(err){$('#pMsg').textContent='Diese Datei ist kein Spielstand der Kleinen Werft.';}});};
   let armed=false;$('#pReset').onclick=e=>{if(!armed){armed=true;e.target.textContent='Wirklich alles löschen?';return;}LS.del(SAVE_KEY);location.reload();};
   $('#pFetch').onclick=async()=>{$('#pMsg').textContent='Suche veröffentlichte Karte …';const m=await fetchPublished();if(m&&m.stamp!==(MAP&&MAP.stamp)){LS.set('kw.map',m);buildWorld(m);refreshFog();$('#pMsg').textContent='Neue Karte geladen.';}else $('#pMsg').textContent=m?'Die Karte ist schon aktuell.':'Keine veröffentlichte Karte gefunden.';};
-  $('#pEditor').onclick=()=>{location.hash='editor';location.reload();};}
+  $('#pEditor').onclick=()=>{location.hash='editor';location.reload();};
+  if($('#pArch'))$('#pArch').onclick=()=>openArchive(back);
+  if($('#pArchBack'))$('#pArchBack').onclick=()=>{location.href='../../';};}
+// Versions-Archiv (nur App): Liste der älteren Versionen, Antippen startet sie unter v/NN/
+function openArchive(back){const cur=(window.KW_BUILD||{}).v,L=(window.KW_ARCHIV_LIST||[]).filter(e=>e.v!==cur).slice().reverse();
+  $('#modalRoot').innerHTML=`<div class="modal"><div class="card parents"><button class="round closeX" id="mClose" aria-label="Schließen">✖️</button><h2>Ältere Versionen</h2><p>Antippen startet die Version. Sie braucht Internet und hat eigene Spielstände (beim ersten Öffnen eine Kopie der aktuellen).</p>
+    ${L.length?L.map(e=>`<div class="prow"><span><b>Version ${e.v}</b><br><small>${e.t}${e.txt?' · '+e.txt:''}</small></span><button class="pbtn alt" data-v="${e.v}">Starten</button></div>`).join(''):'<p>Noch keine älteren Versionen.</p>'}
+    <div class="pmsg" id="pMsg" role="status">${navigator.onLine?'':'Keine Internetverbindung – ältere Versionen gehen gerade nicht.'}</div></div></div>`;
+  $('#mClose').onclick=()=>openParents(back);
+  document.querySelectorAll('#modalRoot [data-v]').forEach(b=>b.onclick=()=>{if(!navigator.onLine){$('#pMsg').textContent='Keine Internetverbindung – ältere Versionen gehen gerade nicht.';SFX.noe();return;}persist();location.href='v/'+b.dataset.v+'/';});}
 
 // ---------------- Fähigkeiten (veröffentlichte Karte, Download) ----------------
 async function waitClaude(){if(window.KW_APP)return null;for(let i=0;i<30;i++){if(window.claude&&window.claude.use)return window.claude;await new Promise(r=>setTimeout(r,100));}return null;}
