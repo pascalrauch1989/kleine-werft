@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"><meta name="theme-color" content="#2f8fd0"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
-<script>window.KW_APP=1;window.KW_BUILD={"v": "71", "t": "13.11.2026, 13:28 Uhr"};</script>
+<script>window.KW_APP=1;window.KW_BUILD={"v": "72", "t": "13.11.2026, 13:46 Uhr"};</script>
 <title>Kleine Werft</title>
 <style>@font-face{font-family:"Fredoka";src:url("fonts/Fredoka.ttf") format("truetype");font-weight:300 700;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype");font-weight:700;font-display:swap}</style>
 <style>
@@ -82,11 +82,13 @@ button{font-family:inherit;color:inherit}
 #dock{position:absolute;left:0;right:0;bottom:0;padding:0 calc(12px + env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) calc(12px + env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:10px;align-items:center}
 #dockIn{display:flex;flex-direction:column;align-items:center;max-width:100%}
 #dockIn #tray{min-width:min(740px,100%);justify-content:center}
+#tray:has(.tile.small){gap:6px}
 #tray{display:flex;gap:12px;overflow-x:auto;max-width:100%;padding:14px 16px;background:#fff6e2;border:4px solid var(--sun-deep);border-radius:24px;box-shadow:0 6px 0 rgba(0,0,0,.12);scrollbar-width:none;position:relative;z-index:0}
 #tray::-webkit-scrollbar{display:none}
 .tile{flex:none;width:92px;height:92px;border:none;border-radius:24px;background:#fff;box-shadow:0 5px 0 rgba(0,0,0,.14);font-size:48px;display:grid;place-items:center;cursor:grab;touch-action:none;position:relative}
 .tile svg{width:74px;height:74px}
 .tile .dot{width:60px;height:60px;border-radius:50%;border:5px solid #fff;box-shadow:0 0 0 3px rgba(0,0,0,.12)}
+.tile.small{width:64px;height:64px;border-radius:18px}.tile.small .dot{width:44px;height:44px;border-width:4px}
 .tile.on::after{content:"";position:absolute;inset:-5px;border-radius:28px;border:5px solid var(--leaf)}
 #tabs{display:flex;gap:6px;align-items:flex-start;padding:0 18px;position:relative;z-index:1;margin-top:-4px;height:84px}
 .tab{width:80px;height:62px;padding:4px 6px 6px;border:4px solid #d9cfb8;border-top:none;border-radius:0 0 20px 20px;background:#ece3cf;opacity:.85;font-size:36px;cursor:pointer;position:relative;transition:height .15s}
@@ -460,7 +462,7 @@ function hornOff(){if(!hornNodes)return;const {g,os}=hornNodes;g.gain.linearRamp
 const NOTE_IDX={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
 function nf(n){if(n==='R')return 0;const m=n.match(/^([A-G](?:#|b)?)(\d)$/);return m?440*Math.pow(2,(NOTE_IDX[m[1]]+12*(+m[2]+1)-69)/12):0;}
 // ---------------- Version & Update-Stand (Startbildschirm unten links, Elternbereich) ----------------
-/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "71", "t": "13.11.2026, 13:28 Uhr", "test": 1};/*KW_BUILD_END*/
+/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "72", "t": "13.11.2026, 13:46 Uhr", "test": 1};/*KW_BUILD_END*/
 const UPD={state:null,v:null,pct:0};
 function verText(){const B=window.KW_BUILD||{};let s=(B.test?'Test · ':'')+'Version '+B.v+(B.t?' · '+B.t:'');
   if(UPD.state==='first')s+=' · Offline-Speicher ⬇ '+UPD.pct+' %';else if(UPD.state==='firstdone')s+=' · offline bereit ✓';
@@ -1504,7 +1506,9 @@ const AI_DESIGNS={
   schlepper:{v:2,material:'stahl',bow:'rund',stern:'rund',mids:1,width:1,hull:'#e8473c',deck:'#22314a',horn:'ente',screw:true,sails:[],wheels:[],tops:{'1,0':[{t:'bruecke',c:'#ffffff'}],'1,1':[{t:'doppel',c:'#ffd23f'}]},deko:[{id:'ring',ax:0,side:-1},{id:'ring',ax:0,side:1}]},
   dampfer:{v:2,material:'stahl',bow:'spitz',stern:'rund',mids:8,width:1,hull:'#151515',deck:'#d9b27c',horn:'ozean',screw:true,sails:[],wheels:[],tops:(()=>{const t={};for(let ax=2;ax<14;ax++)[0,1].forEach(c=>{t[ax+','+c]=[{t:'kabine',c:'#ffffff'},{t:'kabine',c:'#ffffff'}];});[4,7,10,13].forEach((ax,k)=>{t[ax+','+(k%2)].push({t:'titanic',c:'#d9a441'});});t['2,0'].push({t:'bruecke',c:'#ffffff'});t['0,0']=[{t:'boot',c:'#ffffff',side:-1}];t['0,1']=[{t:'boot',c:'#ffffff',side:1}];return t;})(),deko:[]}
 };
-const AI_ROUTES=[['faehre',0,1],['kutter',2,3],['frachter',4,10],['segler',3,7],['raddampfer',1,6],['pirat',7,8],['schlepper',9,11],['dampfer',5,2],['faehre2',0,11],['kutter2',6,8],['segler2',2,9],['frachter2',10,0]];
+const AI_ROUTES=[['faehre',0,1],['kutter',2,3],['frachter',4,10],['segler',3,7],['raddampfer',1,6],['pirat',7,8],['schlepper',9,11],['dampfer',5,2],['faehre2',0,11],['kutter2',6,8],['segler2',2,9],['frachter2',10,0],
+  // berühmte Schiffe (Vorlagen aus dem Schiffsbuch) auf langen Routen
+  ['titanic',0,8],['icon',1,10],['moby',3,5],['qm2',4,9],['evergiven',11,7],['gorchfock',6,1],['santamaria',9,3],['seenot',5,0]];
 AI_DESIGNS.faehre2=Object.assign(clone(AI_DESIGNS.faehre),{hull:'#ffd23f'});AI_DESIGNS.kutter2=Object.assign(clone(AI_DESIGNS.kutter),{hull:'#3fbf6a',horn:'ente'});
 AI_DESIGNS.segler2=Object.assign(clone(AI_DESIGNS.segler),{hull:'#c98f52',sails:[{t:'spinnaker',ax:3,c:'#fff'},{t:'dreieck',ax:6,c:'#fffaf0'}]});AI_DESIGNS.frachter2=Object.assign(clone(AI_DESIGNS.frachter),{hull:'#2f8fd0',horn:'kutter'});
 function waterGrid(hazards){const B=new Uint8Array(N*N);
@@ -1520,9 +1524,10 @@ let AI_GRID=null;
 function buildAIShips(grp,harbors,hazards){const B=waterGrid(hazards),B0=waterGrid([]),ai=[];AI_GRID=B;
   AI_ROUTES.forEach(([id,ha,hb],k)=>{if(ha>=harbors.length||hb>=harbors.length)return;const A=harbors[ha],Bh=harbors[hb];
     // jedes Schiff bekommt einen eigenen Liegeplatz vor dem Hafen, damit sich keine Schiffe überlappen
-    const off=(h,j)=>{const lat=((j%3)-1)*18,out=16+(j%2)*12;return [h.x+h.ox*out-h.oz*lat,h.z+h.oz*out+h.ox*lat];};const sa=off(A,k),sb=off(Bh,k+1);
+    const src=AI_DESIGNS[id]||TEMPLATES[id];if(!src)return;const big=Math.max(0,(src.mids||1)*3-12);
+    const off=(h,j)=>{const lat=((j%3)-1)*18,out=16+(j%2)*12+big;return [h.x+h.ox*out-h.oz*lat,h.z+h.oz*out+h.ox*lat];};const sa=off(A,k),sb=off(Bh,k+1);
     const path=routeBetween(B,sa[0],sa[1],sb[0],sb[1])||routeBetween(B0,sa[0],sa[1],sb[0],sb[1]);if(!path)return;
-    const d=migrateDesign(AI_DESIGNS[id]),sh=shipMerge(buildShip(d));addCaptain(sh,AI_OUTFITS[id]||DEFAULT_OUTFIT);grp.add(sh.group);const fi=clamp(Math.floor(path.length*(.2+((k*.37)%.6))),1,path.length-1),p0=path[fi-1];
+    const d=migrateDesign(clone(src)),sh=shipMerge(buildShip(d));addCaptain(sh,AI_OUTFITS[id]||DEFAULT_OUTFIT);grp.add(sh.group);const fi=clamp(Math.floor(path.length*(.2+((k*.37)%.6))),1,path.length-1),p0=path[fi-1];
     ai.push({id,d,sh,path,i:fi,dir:1,x:p0.x,z:p0.z,h:Math.atan2(-(path[fi].z-p0.z),path[fi].x-p0.x),v:0,wait:0,greet:5+k*3,stop:0,reply:0,r:sh.L*.4+sh.W*.5,visit:null});});
   return ai;}
 function clearLine(ax,az,bx,bz){const n=Math.ceil(Math.hypot(bx-ax,bz-az)/10);for(let i=1;i<n;i++){const x=lerp(ax,bx,i/n),z=lerp(az,bz,i/n);if(terrainH(x,z)>-1)return false;}return true;}
@@ -1855,7 +1860,7 @@ function updateRescues(dt,t){for(let i=RESCUES.length-1;i>=0;i--){const R=RESCUE
 function clearRescues(){RESCUES.splice(0).forEach(R=>{seaScene.remove(R.g);disposeTree(R.g);});}
 
 // ---------- Computer-Schiff wird versenkt ----------
-function sinkAI(a){if(a.sunk)return;const kind=sinkKindFor('ram');a.sunk={t:0,respawn:30+Math.random()*30,kind,sd:Math.random()<.5?-1:1};addWreck(a.x,a.z,a.h,a.d,false,kind);if(kind==='bruch'){spawnBreak(a.d,a.x,a.z,a.h,a.sh.group.scale);a.sh.group.visible=false;}a.visit=null;a.v=0;if(a.sh.cap)a.sh.cap.m.g.visible=false;SFX.blubb();
+function sinkAI(a){if(a.sunk)return;const kind=sinkKindFor('ram',a.sh.L);a.sunk={t:0,respawn:30+Math.random()*30,kind,sd:Math.random()<.5?-1:1};addWreck(a.x,a.z,a.h,a.d,false,kind);if(kind==='bruch'){spawnBreak(a.d,a.x,a.z,a.h,a.sh.group.scale);a.sh.group.visible=false;}a.visit=null;a.v=0;if(a.sh.cap)a.sh.cap.m.g.visible=false;SFX.blubb();
   spawnRescue(a.sh,a.x,a.z,a.h,AI_OUTFITS[a.id]||DEFAULT_OUTFIT,a.d,true,false);}
 function updateSunkAI(a,dt){const S=a.sunk;S.t+=dt;const g=a.sh.group;
   if(S.t<5){if(S.kind==='bruch')g.visible=false;else{sinkPose(a.sh,S.kind,S.t,S.sd);g.visible=true;}return;}
@@ -2102,7 +2107,9 @@ function wreckList(){if(!Array.isArray(save.wrecks))save.wrecks=[];return save.w
 function wreckAge(w){return clamp(((save.clock||0)-w.born)/WRECK_LIFE,0,1);}
 function hash01(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return ((h>>>0)%100000)/100000;}
 const SINK_KINDS=['kentern','seite','bruch','bug','heck'];
-function sinkKindFor(cause){const r=Math.random();if(cause==='mine')return 'bruch';if(cause==='eisberg')return r<.6?'bug':'bruch';if(cause==='riff')return r<.5?'seite':'kentern';return SINK_KINDS[Math.floor(r*SINK_KINDS.length)];}
+function sinkKindFor(cause,L){const r=Math.random();if(cause==='mine')return 'bruch';if(cause==='eisberg')return r<.6?'bug':'bruch';if(cause==='riff')return r<.5?'seite':'kentern';
+  // Rammen: lange Schiffe zerbrechen öfter (kurz ≈ 20 %, ab ~110 lang ≈ 50 %)
+  const pb=clamp(.2+((L||30)-30)/80*.3,.2,.5);if(r<pb)return 'bruch';const o=['kentern','seite','bug','heck'];return o[Math.floor((r-pb)/(1-pb)*4)%4];}
 // Bewegung beim Sinken je nach Art (für eigenes und Computer-Schiff)
 function sinkPose(sh,kind,t,sd){const p=sh.pivot,g=sh.group,k=Math.min(1,t/3.2),e=k*k*(3-2*k),dn=(a,s)=>-Math.pow(Math.max(0,t-a),1.65)*s;
   if(kind==='kentern'){p.rotation.x=e*Math.PI*sd;p.rotation.z=0;g.position.y=Math.sin(e*Math.PI)*.6+dn(2.6,1.3);}
@@ -2638,6 +2645,8 @@ function openMap(){if(!world)return;SFX.tap();openLayer();const S=Math.floor(Mat
     x.imageSmoothingEnabled=true;x.fillStyle='#1f5276';x.fillRect(0,0,W,W);x.save();rot();x.drawImage(mapBase,0,0,W,W);x.restore();x.textAlign='center';x.textBaseline='middle';x.lineWidth=W*.004;x.strokeStyle='#22314a';
     world.harbors.forEach((h,i)=>{if(!seen(h.x,h.z))return;const [px,py]=P(h.x,h.z),r=W*.022;x.beginPath();x.arc(px,py,r,0,7);x.fillStyle=visited.has(i)?'#3fbf6a':'#ffffff';x.fill();x.stroke();x.font=`${r*1.2}px sans-serif`;x.fillText('⚓',px,py+1);});
     world.ai.forEach(a=>{if(a.sunk||!seen(a.x,a.z))return;const [px,py]=P(a.x,a.z);x.beginPath();x.arc(px,py,W*.007,0,7);x.fillStyle='#ffffff';x.fill();x.stroke();});
+    (save.wrecks||[]).forEach(w=>{if(!seen(w.x,w.z))return;const [px,py]=P(w.x,w.z),u=W*.012;x.save();x.translate(px,py);if(w.own){x.beginPath();x.arc(0,0,u*2.3,0,7);x.lineWidth=W*.005;x.strokeStyle='#ffd23f';x.stroke();}
+      x.rotate(-.35);x.beginPath();x.moveTo(-u*1.6,0);x.lineTo(u*1.6,0);x.lineTo(u*1.1,u*.8);x.lineTo(-u*1.1,u*.8);x.closePath();x.fillStyle='#4a3a2e';x.fill();x.lineWidth=W*.0025;x.strokeStyle='#22314a';x.stroke();x.beginPath();x.moveTo(-u*.2,0);x.lineTo(-u*.2,-u*1.4);x.lineTo(u*.6,-u*.9);x.strokeStyle='#22314a';x.stroke();x.restore();});
     x.font=`${W*.032}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;world.finds.forEach(f=>{if(!stickers.has(f.id))return;const [px,py]=P(f.x,f.z);x.fillText(FIND_BY_ID[f.id].e,px,py);});
     for(let i=0;i<FOG_N*FOG_N;i++){fd.data[i*4]=226;fd.data[i*4+1]=234;fd.data[i*4+2]=240;fd.data[i*4+3]=explored[i]?0:240;}fx.putImageData(fd,0,0);x.save();rot();x.drawImage(fog,0,0,W,W);x.restore();
     const [bx,by]=mode==='harbor'&&HB?P(world.harbors[HB.idx].x,world.harbors[HB.idx].z):P(boat.x,boat.z),a=Math.atan2(-Math.sin(boat.h),Math.cos(boat.h))+Math.PI/4,pulse=1+.15*Math.sin(performance.now()/250);x.save();x.translate(bx,by);x.beginPath();x.arc(0,0,W*.04*pulse,0,7);x.fillStyle='rgba(255,210,63,.35)';x.fill();
@@ -2694,7 +2703,34 @@ const TEMPLATES={
     for(let ax=8;ax<=13;ax++)[-1,1].forEach(side=>d.boats.push({ax,side,c:'#ff8a1f'}));
     d.deko.push({id:'flagge',at:'heck'},{id:'anker',side:-1},{id:'anker',side:1});})
 };
-const TEMPLATE_ORDER=['titanic','icon','moby'];
+// Gorch Fock: weißes Segelschulschiff, drei Masten mit Rahsegeln, Klüver vorn, kleine Deckshäuser
+TEMPLATES.gorchfock=mkTpl({material:'stahl',bow:'spitz',stern:'rund',mids:6,width:0,hull:'#f4f6f8',keel:'#9b2f28',band:'#d9a441',deck:'#d9b27c',horn:'kutter',screw:false},(d,put)=>{
+  d.sails.push({t:'rah',ax:2,col:0,c:'#fffaf0'},{t:'rah',ax:5,col:0,c:'#fffaf0'},{t:'rah',ax:8,col:0,c:'#fffaf0'},{t:'dreieck',ax:11,col:0,c:'#fffaf0'});
+  put(0,0,[{t:'kabine',c:'#f4f1e8'}]);put(1,0,[{t:'bruecke',c:'#f4f1e8'}]);put(4,0,[{t:'kabine',c:'#f4f1e8'}]);put(7,0,[{t:'kabine',c:'#f4f1e8'}]);
+  [3,6,9].forEach(ax=>[-1,1].forEach(side=>d.boats.push({ax,side,c:'#f4f6f8'})));d.deko.push({id:'flagge',at:'heck'},{id:'anker',side:-1},{id:'anker',side:1});});
+// Queen Mary 2: Ozeandampfer, schwarzer Rumpf mit rotem Unterwasserschiff, weiße Balkondecks, roter Schornstein, orange Rettungsboote
+TEMPLATES.qm2=mkTpl({material:'stahl',bow:'spitz',stern:'rund',mids:13,width:2,hull:'#151515',keel:'#9b2f28',band:'#d9a441',deck:'#c9d3dc',horn:'ozean'},(d,put)=>{
+  const H=[1,2,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,3,3,2,1,0,0,0];
+  H.forEach((h,ax)=>{for(let c=0;c<3;c++)put(ax,c,Array.from({length:h},()=>({t:'balkon',c:'#ffffff'})));});
+  for(let c=0;c<3;c++)put(19,c,[{t:'bruecke',c:'#ffffff'}]);put(18,1,[{t:'kabine',c:'#ffffff'},'radar']);
+  put(9,1,[{t:'kabine',c:'#ffffff'},{t:'schornstein',c:'#e8473c'}]);put(5,0,[{t:'pool',c:'#4fc3f7'}]);put(5,2,[{t:'pool',c:'#4fc3f7'}]);put(13,1,[{t:'pool',c:'#4fc3f7'}]);
+  for(let ax=6;ax<=17;ax++)[-1,1].forEach(side=>d.boats.push({ax,side,c:'#ff8a1f'}));d.deko.push({id:'flagge',at:'heck'},{id:'anker',side:-1},{id:'anker',side:1});});
+// Ever Given: riesiges Containerschiff, grüner Rumpf, Container bis 4 hoch, Brücke vorn, Schornstein achtern
+TEMPLATES.evergiven=mkTpl({material:'stahl',bow:'rund',stern:'flach',mids:16,width:2,hull:'#2e7d4f',keel:'#9b2f28',band:'#ffffff',deck:'#7d8b98',horn:'ozean'},(d,put)=>{
+  const CC=['#e8473c','#2f8fd0','#3fbf6a','#ffd23f','#ff9f1c','#7b5cd6','#ffffff','#9b6234'];let q=0;
+  for(let ax=0;ax<=28;ax+=2){if(ax===22||ax===4)continue;const hh=ax<4||ax>26?2:4;for(let c=0;c<3;c++){const a=[],b=[];for(let l=0;l<hh;l++){a.push({t:'container',c:CC[(q++*5)%CC.length]});b.push({t:'cfill'});}put(ax,c,a);put(ax+1,c,b);}}
+  for(let c=0;c<3;c++){put(22,c,[{t:'kabine',c:'#ffffff'},{t:'kabine',c:'#ffffff'},{t:'kabine',c:'#ffffff'},{t:'kabine',c:'#ffffff'},{t:'bruecke',c:'#ffffff'}]);}put(23,1,[{t:'kabine',c:'#ffffff'},'radar']);
+  put(4,1,[{t:'kabine',c:'#ffffff'},{t:'modern',c:'#22314a'}]);put(5,1,[{t:'kabine',c:'#ffffff'}]);
+  [-1,1].forEach(side=>d.boats.push({ax:5,side,c:'#ff8a1f'}));d.deko.push({id:'anker',side:-1},{id:'anker',side:1});});
+// Santa Maria: Holzschiff des Kolumbus, Achterkastell, zwei Rahsegel + Lateinersegel
+TEMPLATES.santamaria=mkTpl({material:'holz',bow:'spitz',stern:'spiegel',mids:3,width:0,hull:'#7a4a2e',keel:'#4a2e1a',band:'#d9a441',deck:'#d9b27c',horn:'kutter',screw:false},(d,put)=>{
+  d.sails.push({t:'dreieck',ax:0,col:0,c:'#f4f1e8'},{t:'rah',ax:3,col:0,c:'#f4f1e8'},{t:'rah',ax:5,col:0,c:'#f4f1e8'});
+  put(1,0,[{t:'kabine',c:'#9b6234'}]);put(4,0,[{t:'kabine',c:'#9b6234'}]);d.deko.push({id:'flagge',at:'heck'},{id:'anker',side:1},{id:'truhe',key:'2,0'});});
+// Seenotrettungskreuzer: schnell, rot-weiß, hohe Brücke, Radar, Tochterboot achtern
+TEMPLATES.seenot=mkTpl({material:'stahl',bow:'spitz',stern:'flach',mids:3,width:1,hull:'#e8473c',keel:'#22314a',band:'#ffffff',deck:'#c9d3dc',horn:'fanfare'},(d,put)=>{
+  for(let c=0;c<2;c++){put(2,c,[{t:'kabine',c:'#ffffff'}]);put(3,c,[{t:'kabine',c:'#ffffff'},{t:'bruecke',c:'#ffffff'}]);put(4,c,[{t:'kabine',c:'#ffffff'}]);}
+  put(3,0,['radar']);put(4,1,[{t:'mast',c:'#ffffff'}]);d.boats.push({ax:0,side:-1,c:'#ff8a1f'},{ax:0,side:1,c:'#ff8a1f'});d.deko.push({id:'ring',ax:1,side:-1},{id:'ring',ax:1,side:1},{id:'flagge',at:'heck'});});
+const TEMPLATE_ORDER=['titanic','icon','moby','qm2','evergiven','gorchfock','santamaria','seenot'];
 // ---------------- Schiffsbuch: eigene Schiffe wechseln, Vorlagen nutzen ----------------
 const MAX_SHIPS=12,THUMBS=new Map();
 const BOOK_SVG=`<svg viewBox="0 0 64 64"><rect x="9" y="5" width="46" height="54" rx="6" fill="#2f8fd0" stroke="#22314a" stroke-width="3"/><rect x="9" y="5" width="9" height="54" rx="3" fill="#1f5f94" stroke="#22314a" stroke-width="3"/><path d="M55 54H20" stroke="#fffaf0" stroke-width="3"/>
@@ -2709,7 +2745,7 @@ function deleteShip(k){ensureShips();if(k===save.cur||k<0||k>=save.ships.length)
 function openBook(){SFX.tap();ensureShips();const fresh=!document.querySelector('#modalRoot .bookgrid');if(fresh)openLayer();
   const own=save.ships.map((d,i)=>`<div class="bwrap"><button class="ccard bk${i===save.cur?' cur':''}" data-k="${i}" aria-label="Schiff ${i+1}"><span class="ph">⛵</span>${i===save.cur?'<span class="tick">✅</span>':''}</button>${i===save.cur?'':`<button class="bdel" data-del="${i}" aria-label="Löschen">✕</button>`}</div>`).join('');
   const plus=save.ships.length<MAX_SHIPS?`<button class="ccard plus bk" id="bNew" aria-label="Neues Schiff"><span>+</span></button>`:'';
-  const tpl=TEMPLATE_ORDER.map(id=>`<button class="ccard bk tpl" data-t="${id}" aria-label="${{titanic:'Titanic',icon:'Icon of the Seas',moby:'Moby Zazà'}[id]}"><span class="ph">⛵</span><span class="star">⭐</span></button>`).join('');
+  const tpl=TEMPLATE_ORDER.map(id=>`<button class="ccard bk tpl" data-t="${id}" aria-label="${{titanic:'Titanic',icon:'Icon of the Seas',moby:'Moby Zazà',qm2:'Queen Mary 2',evergiven:'Ever Given',gorchfock:'Gorch Fock',santamaria:'Santa Maria',seenot:'Seenotrettungskreuzer'}[id]}"><span class="ph">⛵</span><span class="star">⭐</span></button>`).join('');
   $('#modalRoot').innerHTML=`<div class="modal"><div class="card"><div class="bookgrid">${own}${plus}</div><div class="bsep"></div><div class="bookgrid">${tpl}</div></div></div>`;
   const root=$('#modalRoot');
   root.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const k=+b.dataset.k;if(k!==save.cur){SFX.jubel();switchShip(k);}else SFX.tap();closeModal();});
@@ -2740,11 +2776,11 @@ function trayItems(){const W=7.5;
   if(curTab==='antrieb')return [{type:'screw',v:'schraube',html:SCREW_SVG,live:design.screw},
     ...Object.keys(SAIL_SVG).map(k=>({type:'sail',v:k,html:SAIL_SVG[k],live:design.sails.some(s=>s.t===k)})),
     ...Object.keys(WHEEL_SVG).map(k=>({type:'wheel',v:k,html:WHEEL_SVG[k],live:design.wheels.some(w=>w.t===k)}))];
-  if(curTab==='farbe')return PALETTE.map(c=>({type:'color',v:c,html:`<div class="dot" style="background:${c}"></div>`}));
+  if(curTab==='farbe')return PALETTE.map(c=>({type:'color',v:c,cls:'small',html:`<div class="dot" style="background:${c}"></div>`}));
   if(curTab==='horn')return Object.keys(HORNS).map(k=>({type:'horn',v:k,html:HORNS[k].icon,on:design.horn===k}));
   return Object.keys(DEKO_SVG).map(k=>({type:'deko',v:k,html:DEKO_SVG[k]}));}
 function renderTabs(){const tabs=$('#tabs');tabs.innerHTML='';TABS.forEach(t=>{const b=document.createElement('button');b.className='tab';b.role='tab';b.innerHTML=t.icon;b.setAttribute('aria-selected',t.id===curTab);b.onclick=()=>{curTab=t.id;SFX.tap();renderTabs();};tabs.appendChild(b);});
-  const tray=$('#tray');tray.innerHTML='';trayItems().forEach(it=>{const b=document.createElement('button');b.className='tile'+(it.on?' on':'')+(it.live?' live':'');b.innerHTML=it.html;b.dataset.type=it.type;b.dataset.v=it.v;tray.appendChild(b);});}
+  const tray=$('#tray');tray.innerHTML='';trayItems().forEach(it=>{const b=document.createElement('button');b.className='tile'+(it.on?' on':'')+(it.live?' live':'')+(it.cls?' '+it.cls:'');b.innerHTML=it.html;b.dataset.type=it.type;b.dataset.v=it.v;tray.appendChild(b);});}
 function poke(el){if(!el)return;el.classList.remove('poke');void el.offsetWidth;el.classList.add('poke');setTimeout(()=>el.classList.remove('poke'),480);}
 function pushUndo(){undoStack.push(JSON.stringify(design));if(undoStack.length>60)undoStack.shift();}
 $('#undo').onclick=()=>{if(!undoStack.length){SFX.noe();return;}design=JSON.parse(undoStack.pop());SFX.weg();rebuildWerftShip();renderTabs();};
