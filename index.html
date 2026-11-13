@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"><meta name="theme-color" content="#2f8fd0"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
-<script>window.KW_ARCHIV_LIST=[{"v": "70", "t": "13.11.2026, 13:10 Uhr", "txt": "Sicht vom ganzen Rumpf"}, {"v": "71", "t": "13.11.2026, 13:28 Uhr", "txt": "Reiter Freizeit, Vollbild-Hinweis behoben"}, {"v": "72", "t": "13.11.2026, 13:46 Uhr", "txt": "8 berühmte Schiffe, Wracks auf der Karte"}, {"v": "73", "t": "13.11.2026, 13:55 Uhr", "txt": "Polarstern, Reiter Technik, Hubschrauber"}, {"v": "74", "t": "13.11.2026, 14:03 Uhr", "txt": "Ältere Versionen im Elternbereich"}];window.KW_APP=1;window.KW_BUILD={"v": "74", "t": "13.11.2026, 14:03 Uhr"};</script>
+<script>window.KW_ARCHIV_LIST=[{"v": "70", "t": "13.11.2026, 13:10 Uhr", "txt": "Sicht vom ganzen Rumpf"}, {"v": "71", "t": "13.11.2026, 13:28 Uhr", "txt": "Reiter Freizeit, Vollbild-Hinweis behoben"}, {"v": "72", "t": "13.11.2026, 13:46 Uhr", "txt": "8 berühmte Schiffe, Wracks auf der Karte"}, {"v": "73", "t": "13.11.2026, 13:55 Uhr", "txt": "Polarstern, Reiter Technik, Hubschrauber"}, {"v": "74", "t": "13.11.2026, 14:03 Uhr", "txt": "Ältere Versionen im Elternbereich"}, {"v": "75", "t": "13.11.2026, 14:25 Uhr", "txt": "Packeis mit Eisbrechen, Forschungsstation"}];window.KW_APP=1;window.KW_BUILD={"v": "75", "t": "13.11.2026, 14:25 Uhr"};</script>
 <title>Kleine Werft</title>
 <style>@font-face{font-family:"Fredoka";src:url("fonts/Fredoka.ttf") format("truetype");font-weight:300 700;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype");font-weight:700;font-display:swap}</style>
 <style>
@@ -331,20 +331,25 @@ function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.i
 const LS={get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}},del(k){try{localStorage.removeItem(k);}catch(e){}}};
 
 // ---------------- Welt-Konstanten ----------------
-const N=180, CELL=10, WORLD=N*CELL;           // 1200 Einheiten Kantenlänge
+const N=180, CELL=10, WORLD=N*CELL;           // Karte: 1800 × 1800 Einheiten
+// Packeis-Streifen (ADR-2026-11-13d): NS Zeilen nördlich der Karte. Intern liegt die Karte um SH nach Süden verschoben (Spielwelt N × NZ Zellen);
+// Karten-Dateien und Spielstände behalten die Karten-Koordinaten.
+const NS=46, NZ=N+NS, SH=NS*CELL, WORLDZ=NZ*CELL;
 const REG={
   h:{icon:'🏠',land:'#7cc35a',sand:'#e6cf92',water:'#3b9fd8',tree:'#2f8f4e',roof:'#d9534f',wall:'#eadcbc'},
   e:{icon:'❄️',land:'#d6e1ea',sand:'#bfcdd8',water:'#3a7fb3',tree:'#b9cfdb',roof:'#4a7fb5',wall:'#e2ddd2'},
   t:{icon:'🌴',land:'#5cc66c',sand:'#ecd391',water:'#2ec4cf',tree:'#2fae47',roof:'#c8a04a',wall:'#efd29c'},
   v:{icon:'🌋',land:'#5b4f4a',sand:'#8a7a70',water:'#3a77a0',tree:'#3b3330',roof:'#5b5b5b',wall:'#a08c7a'}
 };
+REG.p=Object.assign({},REG.e,{icon:'🧊',water:'#24557d'}); // Packeis (nur Album/Wasserfarbe; Gelände zählt als Eisregion)
 const REG_ORDER=['h','e','t','v'];
 const FINDS=[
   {id:'delfine',r:'h',e:'🐬'},{id:'wal',r:'h',e:'🐳'},{id:'leuchtturm',r:'h',e:'🗼',land:1},{id:'fischer',r:'h',e:'🎣'},{id:'flasche',r:'h',e:'🍾'},{id:'regenbogen',r:'h',e:'🌈'},
   {id:'pinguine',r:'e',e:'🐧',land:1},{id:'eisbaer',r:'e',e:'🐻‍❄️',land:1},{id:'robben',r:'e',e:'🦭'},{id:'narwal',r:'e',e:'🐋'},{id:'gletscher',r:'e',e:'🏔️',land:1},{id:'polarlicht',r:'e',e:'🌌'},
   {id:'schildkroete',r:'t',e:'🐢'},{id:'papagei',r:'t',e:'🦜',land:1},{id:'flamingo',r:'t',e:'🦩',land:1},{id:'piraten',r:'t',e:'🏴‍☠️'},{id:'schatz',r:'t',e:'💰',land:1},{id:'krake',r:'t',e:'🐙'},
   {id:'vulkan',r:'v',e:'🌋',land:1},{id:'seeschlange',r:'v',e:'🐉'},{id:'krabbe',r:'v',e:'🦀',land:1},{id:'hai',r:'v',e:'🦈'},{id:'wrack',r:'v',e:'⚓'},{id:'kristall',r:'v',e:'💎',land:1},
-  {id:'leuchtfeuer',r:'h',e:'💡',ev:1},{id:'kalben',r:'e',e:'❄️',ev:1},{id:'wasserfall',r:'t',e:'🏞️',ev:1},{id:'ausbruch',r:'v',e:'🔥',ev:1}
+  {id:'leuchtfeuer',r:'h',e:'💡',ev:1},{id:'kalben',r:'e',e:'❄️',ev:1},{id:'wasserfall',r:'t',e:'🏞️',ev:1},{id:'ausbruch',r:'v',e:'🔥',ev:1},
+  {id:'eisschiff',r:'p',e:'🚢',pk:1},{id:'iglu',r:'p',e:'🛖',land:1,pk:1},{id:'schneeeule',r:'p',e:'🦉',land:1,pk:1},{id:'polarfuchs',r:'p',e:'🦊',land:1,pk:1},{id:'moschus',r:'p',e:'🦬',land:1,pk:1}
 ];
 const FIND_BY_ID=Object.fromEntries(FINDS.map(f=>[f.id,f]));
 const HAZ={eisberg:{e:'🧊',r:6},mine:{e:'💣',r:2.8},riff:{e:'🪸',r:6.5}};
@@ -382,7 +387,7 @@ function genDefaultMap(){
   docks.forEach(([x,z])=>carve(x,z,3.6));
   const okWater=(x,z,c)=>{for(let dz=-c;dz<=c;dz++)for(let dx=-c;dx<=c;dx++){const xx=Math.floor(x)+dx,zz=Math.floor(z)+dz;if(xx<0||zz<0||xx>=N||zz>=N||land[zz*N+xx])return false;}return true;};
   const finds=[];
-  FINDS.filter(f=>!f.ev).forEach(f=>{let t=0;while(t++<6000){const x=6+r()*(N-12),z=6+r()*(N-12);
+  FINDS.filter(f=>!f.ev&&!f.pk).forEach(f=>{let t=0;while(t++<6000){const x=6+r()*(N-12),z=6+r()*(N-12);
     if(regionOfCell(Math.floor(x),Math.floor(z))!==f.r)continue;if(!okWater(x,z,t<3000?4:2))continue;
     if(docks.some(([a,b])=>Math.hypot(a-x,b-z)<(t<3000?14:9)))continue;
     if(RIV.some(([a,b,rr])=>Math.hypot(a-x,b-z)<rr+5))continue;
@@ -399,6 +404,27 @@ function genDefaultMap(){
     hazards.push({t,x:Math.round(x*CELL),z:Math.round(z*CELL)});c++;}});
   return {v:2,stamp:0,land:Array.from(land).join(''),region:reg.join(''),harbors,hazards,finds,bridges,start:{x:harbors[0].x,z:harbors[0].z}};
 }
+// ---------- Packeis-Streifen: feste Inseln, Forschungsstation, Funde, Eisberge (immer gleich, unabhängig von der Karte) ----------
+let PK_STRIP=null;
+function pkStrip(){if(PK_STRIP)return PK_STRIP;const r=rng(4242),land=new Uint8Array(N*NS);
+  const isl=(cx,cz,rad,seed)=>{const a1=seed*1.7,a2=seed*2.3,a3=seed*.9;for(let z=Math.floor(cz-rad-3);z<=cz+rad+3;z++)for(let x=Math.floor(cx-rad-3);x<=cx+rad+3;x++){
+      if(x<3||z<3||x>=N-3||z>=NS-3)continue;const dx=x+.5-cx,dz=z+.5-cz,ang=Math.atan2(dz,dx),d=Math.hypot(dx,dz);
+      const rr=rad+Math.sin(ang*3+a1)*rad*.16+Math.sin(ang*5+a2)*rad*.09+Math.sin(ang*2+a3)*rad*.08;if(d<=rr)land[z*N+x]=1;}};
+  // Inseln (x, z in Zellen des Streifens, Radius); die erste trägt die Forschungsstation
+  const IS=[[90,18,6.5],[28,14,5],[152,15,5.5],[58,32,3.6],[122,31,4],[14,33,3],[170,33,3.2],[112,8,3],[66,8,2.6],[178,10,2.4]];
+  IS.forEach(([x,z,rr],k)=>isl(x,z,rr,200+k));
+  const dock=[90,18+6.5+3];for(let z=Math.floor(dock[1]-4);z<=dock[1]+4;z++)for(let x=Math.floor(dock[0]-4);x<=dock[0]+4;x++)if(Math.hypot(x+.5-dock[0],z+.5-dock[1])<=3.6)land[z*N+x]=0;
+  const finds=[['iglu',28,14],['schneeeule',152,15],['polarfuchs',122,31],['moschus',58,32],['eisschiff',44,27]].map(([id,x,z])=>({id,x:Math.round(x*CELL),z:Math.round(z*CELL)}));
+  const okW=(x,z,c)=>{for(let dz=-c;dz<=c;dz++)for(let dx=-c;dx<=c;dx++){const xx=Math.floor(x)+dx,zz=Math.floor(z)+dz;if(xx<0||zz<0||xx>=N||zz>=NS||land[zz*N+xx])return false;}return true;};
+  const haz=[];let tr=0;while(haz.length<12&&tr++<6000){const x=6+r()*(N-12),z=5+r()*(NS-11);if(!okW(x,z,2))continue;if(Math.hypot(x-dock[0],z-dock[1])<16)continue;
+    if(finds.some(f=>Math.hypot(f.x/CELL-x,f.z/CELL-z)<7))continue;if(haz.some(o=>Math.hypot(o.x/CELL-x,o.z/CELL-z)<12))continue;haz.push({t:'eisberg',x:Math.round(x*CELL),z:Math.round(z*CELL)});}
+  return PK_STRIP={land:Array.from(land).join(''),harbor:{x:Math.round(dock[0]*CELL),z:Math.round(dock[1]*CELL),pk:1},finds,hazards:haz,station:[90*CELL,18*CELL]};}
+// Spielwelt = Packeis-Streifen + Karte (Karte um SH nach Süden verschoben)
+function extendMap(map){const P=pkStrip(),sh=o=>Object.assign({},o,{z:o.z+SH});
+  const harbors=[...map.harbors.map(sh),P.harbor];
+  return {land:P.land+map.land,region:'e'.repeat(N*NS)+map.region,harbors,pkHarbor:harbors.length-1,station:P.station,
+    hazards:[...map.hazards.map(sh),...P.hazards],finds:[...map.finds.filter(f=>!(FIND_BY_ID[f.id]&&FIND_BY_ID[f.id].pk)).map(sh),...P.finds],
+    bridges:(map.bridges||[]).map(b=>Object.assign({},b,{z1:b.z1+SH,z2:b.z2+SH})),stamp:map.stamp};}
 function validMap(m){return m&&typeof m.land==='string'&&m.land.length===N*N&&typeof m.region==='string'&&m.region.length===N*N&&Array.isArray(m.harbors)&&m.harbors.length>0&&Array.isArray(m.hazards)&&Array.isArray(m.finds);}
 
 // ---------------- Speicherstand ----------------
@@ -417,11 +443,13 @@ let currentProfile=LS.get('kw.profile.cur');if(!profiles.some(p=>p.id===currentP
 SAVE_KEY=currentProfile?'kw.save.'+currentProfile:'kw.save.ohne';
 function saveProfiles(){LS.set(PROFILES_KEY,profiles);}
 function normalizeSave(raw){const s=Object.assign({cargo:[],quay:{},stash:null,design:clone(DEFAULT_DESIGN),lastHarbor:0,visited:[],stickers:[],explored:'',music:true,vol:0.7,mapStamp:0,control:'wheel',hazardPct:100},raw||{});
-  if(s.worldVer!==2){s.worldVer=2;s.visited=[];s.explored='';s.lastHarbor=0;s.stickers=(s.stickers||[]).filter(id=>!String(id).startsWith('hafen')&&id!=='welt');}return s;}
+  if(s.worldVer!==2){s.worldVer=2;s.visited=[];s.explored='';s.lastHarbor=0;s.stickers=(s.stickers||[]).filter(id=>!String(id).startsWith('hafen')&&id!=='welt');}
+  if(Array.isArray(s.wrecks))s.wrecks.forEach(w=>{w.z+=SH;}); // gespeichert in Karten-Koordinaten, im Spiel um SH verschoben
+  return s;}
 let save=normalizeSave(LS.get(SAVE_KEY));
 let design=save.design;
 const stickers=new Set(save.stickers), visited=new Set(save.visited);
-function persist(){save.design=design;if(Array.isArray(save.ships)&&save.ships.length)save.ships[clamp(save.cur|0,0,save.ships.length-1)]=design;save.stickers=[...stickers];save.visited=[...visited];save.explored=exploredToStr();LS.set(SAVE_KEY,save);}
+function persist(){save.design=design;if(Array.isArray(save.ships)&&save.ships.length)save.ships[clamp(save.cur|0,0,save.ships.length-1)]=design;save.stickers=[...stickers];save.visited=[...visited];exploredSave();const out=Object.assign({},save);if(Array.isArray(save.wrecks))out.wrecks=save.wrecks.map(w=>Object.assign({},w,{z:w.z-SH}));LS.set(SAVE_KEY,out);}
 
 // ---------------- Audio ----------------
 let AC=null,master=null;
@@ -462,7 +490,7 @@ function hornOff(){if(!hornNodes)return;const {g,os}=hornNodes;g.gain.linearRamp
 const NOTE_IDX={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
 function nf(n){if(n==='R')return 0;const m=n.match(/^([A-G](?:#|b)?)(\d)$/);return m?440*Math.pow(2,(NOTE_IDX[m[1]]+12*(+m[2]+1)-69)/12):0;}
 // ---------------- Version & Update-Stand (Startbildschirm unten links, Elternbereich) ----------------
-/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "74", "t": "13.11.2026, 14:01 Uhr", "test": 1};/*KW_BUILD_END*/
+/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "75", "t": "13.11.2026, 14:24 Uhr", "test": 1};/*KW_BUILD_END*/
 const UPD={state:null,v:null,pct:0};
 function verText(){const B=window.KW_BUILD||{};let s=(B.test?'Test · ':'')+'Version '+B.v+(B.t?' · '+B.t:'');
   if(UPD.state==='first')s+=' · Offline-Speicher ⬇ '+UPD.pct+' %';else if(UPD.state==='firstdone')s+=' · offline bereit ✓';
@@ -1103,9 +1131,9 @@ const VIEW=[42,80,130,210];let zoomLevel=1,camVH=VIEW[1];const camT=new THREE.Ve
 let camZoomT=VIEW[1],seaYaw=0,seaYawT=0;const offR=new THREE.Vector3(),YAX=new THREE.Vector3(0,1,0);
 function seaCamPlace(dt){seaYaw+=(seaYawT-seaYaw)*Math.min(1,dt*8);offR.copy(OFF).applyAxisAngle(YAX,seaYaw);seaCam.position.set(camT.x+offR.x,offR.y,camT.z+offR.z);seaCam.lookAt(camT.x,0,camT.z);}
 function resetViews(){seaYawT=0;seaYaw=0;zoomLevel=1;camZoomT=VIEW[1];orbit.az=.9;orbit.el=.5;orbit.zoom=1;if(typeof KR!=='undefined'&&KR){KR.yaw=0;KR.zoom=1;}}
-let LAND=new Uint8Array(N*N),REGION='',world=null,MAP=null;
-const landCell=(x,z)=>x>=0&&z>=0&&x<N&&z<N&&LAND[z*N+x]===1;
-const regionAt=(x,z)=>REGION[clamp(Math.floor(z/CELL),0,N-1)*N+clamp(Math.floor(x/CELL),0,N-1)]||'h';
+let LAND=new Uint8Array(N*NZ),REGION='',world=null,MAP=null;
+const landCell=(x,z)=>x>=0&&z>=0&&x<N&&z<NZ&&LAND[z*N+x]===1;
+const regionAt=(x,z)=>REGION[clamp(Math.floor(z/CELL),0,NZ-1)*N+clamp(Math.floor(x/CELL),0,N-1)]||'h';
 
 // Wasser (folgt dem Schiff)
 // Lebendiges Wasser: mehrere Wellenzüge + Shader mit Kräuseln, Wellenkämmen, Glitzern und Uferschaum
@@ -1142,35 +1170,39 @@ const water=new THREE.Mesh(waterGeo,waterMat({vertexColors:true,opacity:.8}));
 water.renderOrder=-1;seaScene.add(water);const waterBase=Float32Array.from(waterGeo.attributes.position.array);let waterSnap=null;
 // Rand der Welt: rot-weiß gestrichelte Linie auf dem Wasser, dort stoppt das Schiff
 const EDGE_IN=10,edgeMarks=[];
-{const g=new THREE.BoxGeometry(14,.5,1.6),pts=[];const L=WORLD-2*EDGE_IN;for(let s=0;s<L;s+=22){pts.push([EDGE_IN+s+7,EDGE_IN,0],[EDGE_IN+s+7,WORLD-EDGE_IN,0],[EDGE_IN,EDGE_IN+s+7,1],[WORLD-EDGE_IN,EDGE_IN+s+7,1]);}
+{const g=new THREE.BoxGeometry(14,.5,1.6),pts=[];for(let s=0;s<WORLD-2*EDGE_IN;s+=22)pts.push([EDGE_IN+s+7,EDGE_IN,0],[EDGE_IN+s+7,WORLDZ-EDGE_IN,0]);for(let s=0;s<WORLDZ-2*EDGE_IN;s+=22)pts.push([EDGE_IN,EDGE_IN+s+7,1],[WORLD-EDGE_IN,EDGE_IN+s+7,1]);
  const im=new THREE.InstancedMesh(g,new THREE.MeshBasicMaterial({color:'#e0503a'}),pts.length),m4=new THREE.Matrix4(),r4=new THREE.Matrix4();
  pts.forEach(([x,z,rot],k)=>{m4.makeTranslation(x,1.05,z);if(rot){r4.makeRotationY(Math.PI/2);m4.multiply(r4);}im.setMatrixAt(k,m4);});im.renderOrder=2;seaScene.add(im);
- [[EDGE_IN,EDGE_IN],[WORLD-EDGE_IN,EDGE_IN],[EDGE_IN,WORLD-EDGE_IN],[WORLD-EDGE_IN,WORLD-EDGE_IN]].forEach(([x,z])=>{const b=new THREE.Mesh(new THREE.CylinderGeometry(1.8,2.2,4,10),new THREE.MeshLambertMaterial({color:'#e0503a'}));b.position.set(x,1,z);seaScene.add(b);});}
+ [[EDGE_IN,EDGE_IN],[WORLD-EDGE_IN,EDGE_IN],[EDGE_IN,WORLDZ-EDGE_IN],[WORLD-EDGE_IN,WORLDZ-EDGE_IN]].forEach(([x,z])=>{const b=new THREE.Mesh(new THREE.CylinderGeometry(1.8,2.2,4,10),new THREE.MeshLambertMaterial({color:'#e0503a'}));b.position.set(x,1,z);seaScene.add(b);});}
 const tmpC=new THREE.Color();
 function updateWater(t,cx,cz){const sx=Math.round(cx/20)*20,sz=Math.round(cz/20)*20;water.position.set(sx,0,sz);const pos=waterGeo.attributes.position.array,col=waterGeo.attributes.color.array,sho=waterGeo.attributes.aShore.array;const recolor=waterSnap!==sx+','+sz;waterSnap=sx+','+sz;
   for(let i=0;i<pos.length;i+=3){const wx=waterBase[i]+sx,wz=waterBase[i+2]+sz;pos[i+1]=waveH(wx,wz,t);
-    if(recolor){const inside=wx>=0&&wz>=0&&wx<WORLD&&wz<WORLD;tmpC.set(REG[regionAt(wx,wz)].water);if(!inside)tmpC.offsetHSL(0,-.1,-.08);let sh=0;if(inside){if(landAt(wx+6,wz)||landAt(wx-6,wz)||landAt(wx,wz+6)||landAt(wx,wz-6))sh=1;else if(landAt(wx+13,wz)||landAt(wx-13,wz)||landAt(wx,wz+13)||landAt(wx,wz-13))sh=.45;}if(sh)tmpC.offsetHSL(0,0,.08*sh);sho[i/3]=sh;col[i]=tmpC.r;col[i+1]=tmpC.g;col[i+2]=tmpC.b;}}
+    if(recolor){const inside=wx>=0&&wz>=0&&wx<WORLD&&wz<WORLDZ;tmpC.set(wz<SH?REG.p.water:REG[regionAt(wx,wz)].water);if(!inside)tmpC.offsetHSL(0,-.1,-.08);let sh=0;if(inside){if(landAt(wx+6,wz)||landAt(wx-6,wz)||landAt(wx,wz+6)||landAt(wx,wz-6))sh=1;else if(landAt(wx+13,wz)||landAt(wx-13,wz)||landAt(wx,wz+13)||landAt(wx,wz-13))sh=.45;}if(sh)tmpC.offsetHSL(0,0,.08*sh);sho[i/3]=sh;col[i]=tmpC.r;col[i+1]=tmpC.g;col[i+2]=tmpC.b;}}
   waterGeo.attributes.position.needsUpdate=true;if(recolor){waterGeo.attributes.color.needsUpdate=true;waterGeo.attributes.aShore.needsUpdate=true;}}
 
 // Nebel des Unbekannten
-const FOG_N=90,FOG_CELL=WORLD/FOG_N;const explored=new Uint8Array(FOG_N*FOG_N);
-const fogData=new Uint8Array(FOG_N*FOG_N*4);const fogTex=new THREE.DataTexture(fogData,FOG_N,FOG_N,THREE.RGBAFormat);fogTex.magFilter=THREE.LinearFilter;fogTex.minFilter=THREE.LinearFilter;
-const fogPlane=new THREE.Mesh(new THREE.PlaneGeometry(WORLD,WORLD),new THREE.MeshBasicMaterial({map:fogTex,transparent:true,depthWrite:false,depthTest:false}));
-fogPlane.rotation.x=-Math.PI/2;const FOG_Y=30;fogPlane.position.set(WORLD/2+FOG_Y/1.15,FOG_Y,WORLD/2+FOG_Y/1.15);fogPlane.renderOrder=10;seaScene.add(fogPlane);
-function exploredToStr(){let s='';for(let i=0;i<explored.length;i++)s+=explored[i];return s;}
-function refreshFog(){for(let z=0;z<FOG_N;z++)for(let x=0;x<FOG_N;x++){const i=z*FOG_N+x,ti=((FOG_N-1-z)*FOG_N+x)*4;fogData[ti]=236;fogData[ti+1]=243;fogData[ti+2]=248;fogData[ti+3]=explored[i]?0:238;}fogTex.needsUpdate=true;}
+const FOG_N=90,FOG_CELL=WORLD/FOG_N,FOG_NZ=NZ*CELL/FOG_CELL,FOG_S=NS*CELL/FOG_CELL;const explored=new Uint8Array(FOG_N*FOG_NZ);
+const fogData=new Uint8Array(FOG_N*FOG_NZ*4);const fogTex=new THREE.DataTexture(fogData,FOG_N,FOG_NZ,THREE.RGBAFormat);fogTex.magFilter=THREE.LinearFilter;fogTex.minFilter=THREE.LinearFilter;
+const fogPlane=new THREE.Mesh(new THREE.PlaneGeometry(WORLD,WORLDZ),new THREE.MeshBasicMaterial({map:fogTex,transparent:true,depthWrite:false,depthTest:false}));
+fogPlane.rotation.x=-Math.PI/2;const FOG_Y=30;fogPlane.position.set(WORLD/2+FOG_Y/1.15,FOG_Y,WORLDZ/2+FOG_Y/1.15);fogPlane.renderOrder=10;seaScene.add(fogPlane);
+// Gespeichert wird getrennt: save.explored = Karte (wie bisher, auch für ältere Versionen lesbar), save.exploredN = Packeis-Streifen
+function exploredSave(){let a='',b='';const k=FOG_S*FOG_N;for(let i=0;i<explored.length;i++){if(i<k)b+=explored[i];else a+=explored[i];}save.explored=a;save.exploredN=b;}
+function exploredLoad(stampOk){explored.fill(0);const k=FOG_S*FOG_N,ex=save.explored||'',en=save.exploredN||'';
+  if(stampOk&&ex.length===FOG_N*FOG_N)for(let i=0;i<ex.length;i++)explored[k+i]=ex.charCodeAt(i)===49?1:0;
+  if(en.length===k)for(let i=0;i<k;i++)explored[i]=en.charCodeAt(i)===49?1:0;inlandAll();}
+function refreshFog(){for(let z=0;z<FOG_NZ;z++)for(let x=0;x<FOG_N;x++){const i=z*FOG_N+x,ti=((FOG_NZ-1-z)*FOG_N+x)*4;fogData[ti]=236;fogData[ti+1]=243;fogData[ti+2]=248;fogData[ti+3]=explored[i]?0:238;}fogTex.needsUpdate=true;}
 // Inseln: zusammenhängende Landflächen mit Mittelpunkt; aufgedeckte Küste deckt den Weg bis zur Inselmitte auf
-let ISL_ID=new Int32Array(N*N),ISL=[];
-function buildIslands(){ISL_ID.fill(-1);ISL=[];const st=[];for(let i=0;i<N*N;i++){if(!LAND[i]||ISL_ID[i]>=0)continue;const id=ISL.length;let sx=0,sz=0,n=0;ISL_ID[i]=id;st.push(i);
-    while(st.length){const j=st.pop(),x=j%N,z=(j-x)/N;sx+=x+.5;sz+=z+.5;n++;[[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dz])=>{const a=x+dx,b=z+dz;if(a<0||b<0||a>=N||b>=N)return;const k=b*N+a;if(LAND[k]&&ISL_ID[k]<0){ISL_ID[k]=id;st.push(k);}});}
+let ISL_ID=new Int32Array(N*NZ),ISL=[];
+function buildIslands(){ISL_ID.fill(-1);ISL=[];const st=[];for(let i=0;i<N*NZ;i++){if(!LAND[i]||ISL_ID[i]>=0)continue;const id=ISL.length;let sx=0,sz=0,n=0;ISL_ID[i]=id;st.push(i);
+    while(st.length){const j=st.pop(),x=j%N,z=(j-x)/N;sx+=x+.5;sz+=z+.5;n++;[[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dz])=>{const a=x+dx,b=z+dz;if(a<0||b<0||a>=N||b>=NZ)return;const k=b*N+a;if(LAND[k]&&ISL_ID[k]<0){ISL_ID[k]=id;st.push(k);}});}
     ISL.push({x:sx/n*CELL,z:sz/n*CELL,n});}}
 function inlandFrom(cells){const done=new Set();cells.forEach(i=>{const fx=i%FOG_N,fz=(i-fx)/FOG_N,k=FOG_CELL/CELL;
-    for(let dz=0;dz<k;dz++)for(let dx=0;dx<k;dx++){const lx=fx*k+dx,lz=fz*k+dz;if(lx>=N||lz>=N)continue;const id=ISL_ID[lz*N+lx];if(id<0)continue;
+    for(let dz=0;dz<k;dz++)for(let dx=0;dx<k;dx++){const lx=fx*k+dx,lz=fz*k+dz;if(lx>=N||lz>=NZ)continue;const id=ISL_ID[lz*N+lx];if(id<0)continue;
       const key=i+':'+id;if(done.has(key))continue;done.add(key);const I=ISL[id],x0=(fx+.5)*FOG_CELL,z0=(fz+.5)*FOG_CELL,L=Math.hypot(I.x-x0,I.z-z0),steps=Math.max(1,Math.ceil(L/(FOG_CELL*.5))),w=FOG_CELL*1.6;
       for(let s=0;s<=steps;s++){const px=lerp(x0,I.x,s/steps),pz=lerp(z0,I.z,s/steps),r2=Math.ceil(w/FOG_CELL),cx=Math.floor(px/FOG_CELL),cz=Math.floor(pz/FOG_CELL);
-        for(let b=-r2;b<=r2;b++)for(let a=-r2;a<=r2;a++){const X=cx+a,Z=cz+b;if(X<0||Z<0||X>=FOG_N||Z>=FOG_N)continue;if(Math.hypot((X+.5)*FOG_CELL-px,(Z+.5)*FOG_CELL-pz)>w)continue;explored[Z*FOG_N+X]=1;}}}});}
+        for(let b=-r2;b<=r2;b++)for(let a=-r2;a<=r2;a++){const X=cx+a,Z=cz+b;if(X<0||Z<0||X>=FOG_N||Z>=FOG_NZ)continue;if(Math.hypot((X+.5)*FOG_CELL-px,(Z+.5)*FOG_CELL-pz)>w)continue;explored[Z*FOG_N+X]=1;}}}});}
 function inlandAll(){const c=[];for(let i=0;i<explored.length;i++)if(explored[i])c.push(i);inlandFrom(c);}
-function reveal(px,pz,rad){let ch=false;const nw=[];const r2=Math.ceil(rad/FOG_CELL);const cx=Math.floor(px/FOG_CELL),cz=Math.floor(pz/FOG_CELL);for(let dz=-r2;dz<=r2;dz++)for(let dx=-r2;dx<=r2;dx++){const x=cx+dx,z=cz+dz;if(x<0||z<0||x>=FOG_N||z>=FOG_N)continue;if(Math.hypot((x+.5)*FOG_CELL-px,(z+.5)*FOG_CELL-pz)>rad)continue;const i=z*FOG_N+x;if(!explored[i]){explored[i]=1;ch=true;nw.push(i);}}if(ch){inlandFrom(nw);refreshFog();}}
+function reveal(px,pz,rad){let ch=false;const nw=[];const r2=Math.ceil(rad/FOG_CELL);const cx=Math.floor(px/FOG_CELL),cz=Math.floor(pz/FOG_CELL);for(let dz=-r2;dz<=r2;dz++)for(let dx=-r2;dx<=r2;dx++){const x=cx+dx,z=cz+dz;if(x<0||z<0||x>=FOG_N||z>=FOG_NZ)continue;if(Math.hypot((x+.5)*FOG_CELL-px,(z+.5)*FOG_CELL-pz)>rad)continue;const i=z*FOG_N+x;if(!explored[i]){explored[i]=1;ch=true;nw.push(i);}}if(ch){inlandFrom(nw);refreshFog();}}
 
 // Emoji-Bilder für 3D
 const TEX={};
@@ -1198,13 +1230,13 @@ function hazardMesh(t){const g=new THREE.Group();let pulse=null;
 // =====================================================================
 //  Offene Welt: Landschaft, Straßen & Bahn, Tiere, Computer-Schiffe
 // =====================================================================
-const VN=N+1,VH=new Float32Array(VN*VN);
+const VN=N+1,VNZ=NZ+1,VH=new Float32Array(VN*VNZ);
 const RAMP=40,BRIDGE_H=27,FLAT_H=2.6;
-function terrainH(x,z){const fx=clamp(x/CELL,0,N-.0001),fz=clamp(z/CELL,0,N-.0001),i=Math.floor(fx),j=Math.floor(fz),u=fx-i,v=fz-j;
+function terrainH(x,z){const fx=clamp(x/CELL,0,N-.0001),fz=clamp(z/CELL,0,NZ-.0001),i=Math.floor(fx),j=Math.floor(fz),u=fx-i,v=fz-j;
   const a=VH[j*VN+i],b=VH[j*VN+i+1],c=VH[(j+1)*VN+i],d=VH[(j+1)*VN+i+1];return (a*(1-u)+b*u)*(1-v)+(c*(1-u)+d*u)*v;}
 const maskLand=(x,z)=>landCell(Math.floor(x/CELL),Math.floor(z/CELL));
 // Land = Gelände über dem Wasserspiegel (weiche Küsten statt Kästchen)
-const landAt=(x,z)=>x>=0&&z>=0&&x<WORLD&&z<WORLD&&terrainH(x,z)>.15;
+const landAt=(x,z)=>x>=0&&z>=0&&x<WORLD&&z<WORLDZ&&terrainH(x,z)>.15;
 const REGH={h:.42,e:.7,t:.33,v:.85};
 
 // ---------- Straßen-, Bahn- und Dorfplanung (aus den Brücken der Karte) ----------
@@ -1232,15 +1264,15 @@ function planNetwork(map){const net={hills:[],flats:[],roads:[],rails:[],village
   return net;}
 
 // ---------- Geländehöhen ----------
-function buildHeights(net){const L=new Float32Array(VN*VN),Lb=new Float32Array(VN*VN);
-  for(let j=0;j<VN;j++)for(let i=0;i<VN;i++){let s=0;for(let dz=-1;dz<=0;dz++)for(let dx=-1;dx<=0;dx++)s+=landCell(i+dx,j+dz)?1:0;L[j*VN+i]=s/4;}
-  for(let pass=0;pass<2;pass++){for(let j=0;j<VN;j++)for(let i=0;i<VN;i++){let s=0,n=0;for(let dz=-1;dz<=1;dz++)for(let dx=-1;dx<=1;dx++){const ii=i+dx,jj=j+dz;if(ii<0||jj<0||ii>=VN||jj>=VN)continue;s+=L[jj*VN+ii]*(dx||dz?1:2);n+=dx||dz?1:2;}Lb[j*VN+i]=s/n;}L.set(Lb);}
+function buildHeights(net){const L=new Float32Array(VN*VNZ),Lb=new Float32Array(VN*VNZ);
+  for(let j=0;j<VNZ;j++)for(let i=0;i<VN;i++){let s=0;for(let dz=-1;dz<=0;dz++)for(let dx=-1;dx<=0;dx++)s+=landCell(i+dx,j+dz)?1:0;L[j*VN+i]=s/4;}
+  for(let pass=0;pass<2;pass++){for(let j=0;j<VNZ;j++)for(let i=0;i<VN;i++){let s=0,n=0;for(let dz=-1;dz<=1;dz++)for(let dx=-1;dx<=1;dx++){const ii=i+dx,jj=j+dz;if(ii<0||jj<0||ii>=VN||jj>=VNZ)continue;s+=L[jj*VN+ii]*(dx||dz?1:2);n+=dx||dz?1:2;}Lb[j*VN+i]=s/n;}L.set(Lb);}
   // Abstand zum Wasser (in Zellen) für Hügel und Berge im Inselinneren
-  const D=new Float32Array(N*N).fill(1e9),q=[];for(let k=0;k<N*N;k++)if(!LAND[k]){D[k]=0;q.push(k);}
-  for(let h=0;h<q.length;h++){const k=q[h],x=k%N,z=(k/N)|0;[[1,0],[-1,0],[0,1],[0,-1]].forEach(([a,b])=>{const xx=x+a,zz=z+b;if(xx<0||zz<0||xx>=N||zz>=N)return;const kk=zz*N+xx;if(D[kk]>D[k]+1){D[kk]=D[k]+1;q.push(kk);}});}
-  for(let j=0;j<VN;j++)for(let i=0;i<VN;i++){const k=j*VN+i,l=L[k],x=i*CELL,z=j*CELL;
-    let dd=0,n=0;for(let dz=-1;dz<=0;dz++)for(let dx=-1;dx<=0;dx++){const ii=i+dx,jj=j+dz;if(ii<0||jj<0||ii>=N||jj>=N)continue;dd+=Math.min(D[jj*N+ii],30);n++;}dd=n?dd/n:0;
-    const rg=REGION[clamp(j,0,N-1)*N+clamp(i,0,N-1)]||'h';
+  const D=new Float32Array(N*NZ).fill(1e9),q=[];for(let k=0;k<N*NZ;k++)if(!LAND[k]){D[k]=0;q.push(k);}
+  for(let h=0;h<q.length;h++){const k=q[h],x=k%N,z=(k/N)|0;[[1,0],[-1,0],[0,1],[0,-1]].forEach(([a,b])=>{const xx=x+a,zz=z+b;if(xx<0||zz<0||xx>=N||zz>=NZ)return;const kk=zz*N+xx;if(D[kk]>D[k]+1){D[kk]=D[k]+1;q.push(kk);}});}
+  for(let j=0;j<VNZ;j++)for(let i=0;i<VN;i++){const k=j*VN+i,l=L[k],x=i*CELL,z=j*CELL;
+    let dd=0,n=0;for(let dz=-1;dz<=0;dz++)for(let dx=-1;dx<=0;dx++){const ii=i+dx,jj=j+dz;if(ii<0||jj<0||ii>=N||jj>=NZ)continue;dd+=Math.min(D[jj*N+ii],30);n++;}dd=n?dd/n:0;
+    const rg=REGION[clamp(j,0,NZ-1)*N+clamp(i,0,N-1)]||'h';
     let h=l<.5?(l-.5)*9:(l-.5)*5;
     if(l>=.5){h+=Math.min(dd,16)*REGH[rg]+(Math.sin(x*.031+1.3)*Math.sin(z*.027+.7)+.5*Math.sin(x*.07+z*.05))*1.3*Math.min(1,dd/3);
       net.hills.forEach(H=>{const d=Math.hypot(x-H.x,z-H.z);if(d<H.r)h+=H.h*(.5+.5*Math.cos(Math.PI*d/H.r));});
@@ -1249,8 +1281,8 @@ function buildHeights(net){const L=new Float32Array(VN*VN),Lb=new Float32Array(V
 
 // ---------- Facettierte Low-Poly-Landschaft ----------
 const SNOW_C='#dfe7ee';
-function buildTerrain(grp){const B={},r=rng(11),jit=new Float32Array(VN*VN*2);
-  for(let j=1;j<VN-1;j++)for(let i=1;i<VN-1;i++){const k=j*VN+i;jit[k*2]=(r()-.5)*4.2;jit[k*2+1]=(r()-.5)*4.2;}
+function buildTerrain(grp){const B={},r=rng(11),jit=new Float32Array(VN*VNZ*2);
+  for(let j=1;j<VNZ-1;j++)for(let i=1;i<VN-1;i++){const k=j*VN+i;jit[k*2]=(r()-.5)*4.2;jit[k*2+1]=(r()-.5)*4.2;}
   const V=(i,j)=>{const k=j*VN+i;return [i*CELL+jit[k*2],VH[k],j*CELL+jit[k*2+1]];},c=new THREE.Color(),TS=22;
   const tri=(a,b,d,rg)=>{const h=(a[1]+b[1]+d[1])/3,R=REG[rg];const ux=b[0]-a[0],uy=b[1]-a[1],uz=b[2]-a[2],vx=d[0]-a[0],vy=d[1]-a[1],vz=d[2]-a[2];const nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx,nl=Math.hypot(nx,ny,nz)||1,ny1=Math.abs(ny)/nl;
     let cc,tx;if(h<-.3){cc='#c9b47a';tx='sand';}else if(h<1.2){cc=R.sand;tx=rg==='e'?'snow':rg==='v'?'earth':'sand';}else{cc=R.land;tx=rg==='e'?'snow':rg==='v'?'earth':'grass';}
@@ -1258,7 +1290,7 @@ function buildTerrain(grp){const B={},r=rng(11),jit=new Float32Array(VN*VN*2);
     c.set(cc);c.offsetHSL(0,0,(r()-.5)*.05);if(h<-.3)c.lerp(SEA_DEEP,clamp((-h-.3)/2.4,0,1));
     const L=B[tx]||(B[tx]={pos:[],col:[],uv:[]}),ax=Math.abs(nx)/nl,az=Math.abs(nz)/nl;
     [a,b,d].forEach(p=>{L.pos.push(p[0],p[1],p[2]);L.col.push(c.r,c.g,c.b);if(ny1>.6)L.uv.push(p[0]/TS,p[2]/TS);else if(ax>az)L.uv.push(p[2]/TS,p[1]/TS);else L.uv.push(p[0]/TS,p[1]/TS);});};
-  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const k=j*VN+i,mx=Math.max(VH[k],VH[k+1],VH[k+VN],VH[k+VN+1]);if(mx<-2.2)continue;
+  for(let j=0;j<NZ;j++)for(let i=0;i<N;i++){const k=j*VN+i,mx=Math.max(VH[k],VH[k+1],VH[k+VN],VH[k+VN+1]);if(mx<-2.2)continue;
     const a=V(i,j),b=V(i+1,j),cc=V(i+1,j+1),d=V(i,j+1),rg=REGION[j*N+i]||'h';
     if((i+j)%2){tri(a,d,cc,rg);tri(a,cc,b,rg);}else{tri(a,d,b,rg);tri(b,d,cc,rg);}}
   Object.keys(B).forEach(tx=>{const L=B[tx],g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(L.pos,3));g.setAttribute('color',new THREE.Float32BufferAttribute(L.col,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(L.uv,2));g.computeVertexNormals();
@@ -1486,6 +1518,26 @@ function makeCreature(id,x,z){const g=new THREE.Group(),C={id,home:{x,z},x,z,gro
     const x1=box(5,.12,.6,'#e8473c',4,.1,0);x1.rotation.y=.8;g.add(x1);const x2=box(5,.12,.6,'#e8473c',4,.1,0);x2.rotation.y=-.8;g.add(x2);C.top=5;}
   else if(id==='krabbe'){g.position.y=ground;const b=new THREE.Group();b.add(sph(1,'#e8473c',0,1,0,2,.8,1.5));[[1.8,1.6],[1.8,-1.6]].forEach(([a,c])=>{b.add(cylm(.25,.25,1.6,'#e8473c',a,1.4,c,5));b.add(sph(.7,'#e8473c',a+.6,2.2,c,1.2,.7,.7));});b.add(sph(.25,'#ffffff',1.6,2,.5));b.add(sph(.25,'#ffffff',1.6,2,-.5));for(let k=0;k<3;k++)[-1,1].forEach(s=>{const l=cylm(.12,.12,1.6,'#c0392b',-.6+k*.6,.6,s*1.6,4);l.rotation.x=s*.8;b.add(l);});g.add(b);C.crab=b;C.top=5;}
   else if(id==='kristall'){g.position.y=ground;[[0,0,3.2,4],[2.2,1,2,3],[-2,.8,2.2,2.5],[.5,-2,1.8,2]].forEach(([a,c,s,h])=>{const m=new THREE.Mesh(new THREE.OctahedronGeometry(s,0),new THREE.MeshLambertMaterial({color:'#7fe6ff',emissive:'#2a9fbf'}));m.position.set(a,h,c);m.scale.y=1.6;g.add(m);});C.top=9;}
+  else if(id==='eisschiff'){g.position.y=-.4;const h=new THREE.Group();h.add(box(16,4,5.4,'#5a3b22',0,1,0));h.add(box(16.2,.5,5.6,'#3a2616',0,3.1,0));h.add(box(10,.4,4.8,'#f4f8fb',.5,3.4,0));
+    h.add(box(4,2.6,4,'#6b4423',-5,4.5,0));h.add(box(4.2,.5,4.2,'#f4f8fb',-5,6,0));h.add(cylm(.35,.42,12,'#4a3220',2,9,0,6));const m2=cylm(.3,.35,6,'#4a3220',-1,6,0,6);m2.rotation.z=.8;h.add(m2);
+    const sail=new THREE.Mesh(new THREE.PlaneGeometry(5,4),phong('#d9d2c0',{side:THREE.DoubleSide}));sail.position.set(2.6,10,0);sail.rotation.y=Math.PI/2;sail.rotation.x=.25;h.add(sail);
+    for(let k=0;k<7;k++)h.add(cone(.18,1+k%3*.4,'#dff4ff',-7+k*2.3,2.3,2.8,4));h.rotation.z=.22;h.rotation.x=-.12;g.add(h);
+    [[7,0,3.5],[-7,2,3],[2,4.5,2.6],[-3,-4.5,2.4],[9,-3,2]].forEach(([x,z,s2])=>{const m=new THREE.Mesh(new THREE.IcosahedronGeometry(s2,0),phong('#e9f7ff',{shininess:80}));m.position.set(x,s2*.25,z);m.scale.y=.6;g.add(m);});C.top=14;}
+  else if(id==='iglu'){g.position.y=ground;const snowM=phong('#f7fbfe',{shininess:40});const d=new THREE.Mesh(new THREE.SphereGeometry(4,14,8,0,Math.PI*2,0,Math.PI/2),snowM);g.add(d);
+    [1.2,2.4,3.3].forEach(y=>{const rr=Math.sqrt(16-y*y);const t=new THREE.Mesh(new THREE.TorusGeometry(rr,.07,4,24),mat('#c9dbe8'));t.rotation.x=Math.PI/2;t.position.y=y;g.add(t);});
+    const tun=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,3,10,1,false,0,Math.PI),snowM);tun.rotation.z=Math.PI/2;tun.rotation.y=Math.PI/2;tun.position.set(0,0,4.2);g.add(tun);g.add(box(1.6,1.4,.1,'#22314a',0,.7,5.7));
+    const sl=new THREE.Group();sl.position.set(5,0,2);sl.rotation.y=.5;sl.add(box(3,.25,1.2,'#8b5a2b',0,.6,0));sl.add(box(3.4,.12,.15,'#5c3f22',0,.3,.5));sl.add(box(3.4,.12,.15,'#5c3f22',0,.3,-.5));g.add(sl);C.top=7;}
+  else if(id==='schneeeule'){g.position.y=ground;g.add(new THREE.Mesh(new THREE.DodecahedronGeometry(2.2,0),mat('#8a96a3')));g.children[0].position.y=.8;const o=new THREE.Group();o.position.y=2.6;
+    o.add(sph(1,'#ffffff',0,1,0,1.1,1.35,1));for(let k=0;k<9;k++)o.add(sph(.12,'#3a3f46',-.4+(k%3)*.4,.5+Math.floor(k/3)*.45,.9+((k%2)*.08),1,.6,1));
+    const hd=new THREE.Group();hd.position.y=2.5;hd.add(sph(.85,'#ffffff'));[1,-1].forEach(sd=>{hd.add(sph(.28,'#ffd23f',.34*sd,.12,.72));hd.add(sph(.14,'#11161c',.34*sd,.12,.92));});hd.add(cone(.12,.3,'#22314a',0,-.15,.9,4));o.add(hd);
+    const wl=box(.25,1.6,1.2,'#f1f1f1',-1.05,1.1,0),wr=box(.25,1.6,1.2,'#f1f1f1',1.05,1.1,0);o.add(wl);o.add(wr);g.add(o);C.owl={hd,wl,wr,o};C.top=8;}
+  else if(id==='polarfuchs'){g.position.y=ground;const f=new THREE.Group(),fur='#f6f6f2';f.add(sph(1,fur,0,1.3,0,1.5,.75,.7));f.add(sph(.65,fur,1.5,1.8,0));f.add(cone(.3,.7,fur,1.85,1.7,0,5));f.children[2].rotation.z=-Math.PI/2;f.add(sph(.14,'#11161c',2.2,1.7,0));
+    [[1.4,.3],[1.4,-.3]].forEach(([x,z])=>f.add(cone(.22,.6,fur,x,2.45,z,4)));[[.8,.35],[.8,-.35],[-.8,.35],[-.8,-.35]].forEach(([x,z])=>f.add(cylm(.17,.17,1,'#e9e6dc',x,.5,z,5)));
+    const tail=sph(.55,fur,-1.9,1.6,0,1.6,.6,.6);tail.rotation.z=.4;f.add(tail);f.add(sph(.1,'#22314a',1.8,2.05,.25));f.add(sph(.1,'#22314a',1.8,2.05,-.25));g.add(f);C.fox=f;C.top=6;}
+  else if(id==='moschus'){g.position.y=ground;C.ox=[];[[0,0,0],[4.5,2.5,.6]].forEach(([x,z,ry],k)=>{const o=new THREE.Group();o.position.set(x,0,z);o.rotation.y=ry;
+      o.add(sph(1,'#4a3526',0,2,0,2.2,1.4,1.3));o.add(sph(1,'#7a6450',-.2,2.9,0,1.3,.5,.9));o.add(sph(1,'#3a2a1e',0,1.2,0,2,1,1.25));const hd=new THREE.Group();hd.position.set(2.2,2,0);hd.add(sph(.7,'#3a2a1e',0,0,0,1.1,.9,.8));
+      [1,-1].forEach(sd=>{const hn=new THREE.Mesh(new THREE.TorusGeometry(.55,.14,5,10,Math.PI),mat('#e8dcc0'));hn.position.set(-.1,.45,.45*sd);hn.rotation.y=Math.PI/2;hn.rotation.z=sd*.3;hd.add(hn);});o.add(hd);
+      [[1.1,.6],[1.1,-.6],[-1.1,.6],[-1.1,-.6]].forEach(([a,c])=>o.add(cylm(.25,.25,.9,'#2a1f17',a,.45,c,5)));g.add(o);C.ox.push(hd);});C.top=7;}
   else if(id==='piraten'){C.kind='follow';C.top=22;}
   if(!['regenbogen','polarlicht','wrack','vulkan','gletscher','piraten'].includes(id)){g.scale.setScalar(1.35);C.top*=1.35;}
   g.position.x=x;g.position.z=z;return C;}
@@ -1499,6 +1551,9 @@ function updateCreature(C,t,dt){const near=Math.abs(C.x-camT.x)<380&&Math.abs(C.
   if(!near)return;
   if(C.id==='leuchtturm')C.beam.rotation.y=t*.8;
   if(C.id==='vulkan')C.smoke.forEach((s,k)=>{const p=(t*.2+k/6)%1;s.position.set(-p*6,16+p*14,Math.sin(k)*p*3);s.scale.setScalar(.8+p*2.5);s.material.opacity=.4*(1-p);});
+  if(C.id==='schneeeule'){C.owl.hd.rotation.y=Math.sin(t*.45)*1.3;const fl=Math.max(0,Math.sin(t*.7))>.92?Math.sin(t*18)*.9:0;C.owl.wl.rotation.z=fl;C.owl.wr.rotation.z=-fl;}
+  if(C.id==='polarfuchs'){const a=t*.5;C.fox.position.set(Math.cos(a)*4,Math.abs(Math.sin(t*8))*.25,Math.sin(a)*4);C.fox.rotation.y=-a-Math.PI/2;}
+  if(C.id==='moschus')C.ox.forEach((hd,k)=>{hd.rotation.z=-.35-.3*Math.max(0,Math.sin(t*.6+k*2));});
   if(C.id==='polarlicht')C.ribbons.forEach((m,k)=>{const a=m.geometry.attributes.position,b=m.userData.base;for(let i=0;i<a.count;i++){a.setZ(i,b[i*3+2]+Math.sin(b[i*3]*.08+t*.8+k)*6);a.setY(i,b[i*3+1]+Math.sin(b[i*3]*.05+t*.6)*2);}a.needsUpdate=true;m.material.opacity=.25+.15*Math.sin(t*.7+k);});
   if(C.id==='pinguine')for(let k=0;k<5;k++){const p=C.parts['p'+k];p.rotation.z=Math.sin(t*6+k)*.12;p.position.x=Math.cos(k*1.3+t*.2)*3;p.position.z=Math.sin(k*1.3+t*.2)*3;p.rotation.y=-(k*1.3+t*.2)-Math.PI/2;}
   if(C.id==='eisbaer'){C.bear.position.x=Math.sin(t*.3)*4;C.bear.rotation.y=Math.cos(t*.3)>0?0:Math.PI;}
@@ -1532,21 +1587,21 @@ const AI_DESIGNS={
 };
 const AI_ROUTES=[['faehre',0,1],['kutter',2,3],['frachter',4,10],['segler',3,7],['raddampfer',1,6],['pirat',7,8],['schlepper',9,11],['dampfer',5,2],['faehre2',0,11],['kutter2',6,8],['segler2',2,9],['frachter2',10,0],
   // berühmte Schiffe (Vorlagen aus dem Schiffsbuch) auf langen Routen
-  ['titanic',0,8],['icon',1,10],['moby',3,5],['qm2',4,9],['evergiven',11,7],['gorchfock',6,1],['santamaria',9,3],['seenot',5,0],['polarstern',4,5]];
-AI_DESIGNS.faehre2=Object.assign(clone(AI_DESIGNS.faehre),{hull:'#ffd23f'});AI_DESIGNS.kutter2=Object.assign(clone(AI_DESIGNS.kutter),{hull:'#3fbf6a',horn:'ente'});
+  ['titanic',0,8],['icon',1,10],['moby',3,5],['qm2',4,9],['evergiven',11,7],['gorchfock',6,1],['santamaria',9,3],['seenot',5,0],['polarstern',4,'P'],['eiskutter','P',5]];
+AI_DESIGNS.faehre2=Object.assign(clone(AI_DESIGNS.faehre),{hull:'#ffd23f'});AI_DESIGNS.eiskutter=Object.assign(clone(AI_DESIGNS.kutter),{bow:'eis',mids:2,hull:'#e8473c',horn:'ozean',tops:{'2,0':[{t:'bruecke',c:'#ffffff'}],'1,0':[{t:'kran'}],'0,0':[{t:'radar'}]}});AI_DESIGNS.kutter2=Object.assign(clone(AI_DESIGNS.kutter),{hull:'#3fbf6a',horn:'ente'});
 AI_DESIGNS.segler2=Object.assign(clone(AI_DESIGNS.segler),{hull:'#c98f52',sails:[{t:'spinnaker',ax:3,c:'#fff'},{t:'dreieck',ax:6,c:'#fffaf0'}]});AI_DESIGNS.frachter2=Object.assign(clone(AI_DESIGNS.frachter),{hull:'#2f8fd0',horn:'kutter'});
-function waterGrid(hazards){const B=new Uint8Array(N*N);
-  for(let z=0;z<N;z++)for(let x=0;x<N;x++){let bad=false;for(let dz=-1;dz<=1&&!bad;dz++)for(let dx=-1;dx<=1&&!bad;dx++){const xx=x+dx,zz=z+dz;if(xx<1||zz<1||xx>=N-1||zz>=N-1){bad=true;break;}if(terrainH((xx+.5)*CELL,(zz+.5)*CELL)>-1.2)bad=true;}B[z*N+x]=bad?1:0;}
-  hazards.forEach(h=>{const cx=Math.floor(h.x/CELL),cz=Math.floor(h.z/CELL);for(let dz=-2;dz<=2;dz++)for(let dx=-2;dx<=2;dx++){const xx=cx+dx,zz=cz+dz;if(xx>=0&&zz>=0&&xx<N&&zz<N)B[zz*N+xx]=1;}});return B;}
-function routeBetween(B,ax,az,bx,bz){const nearestFree=(x,z)=>{let cx=Math.floor(x/CELL),cz=Math.floor(z/CELL);for(let r=0;r<12;r++)for(let dz=-r;dz<=r;dz++)for(let dx=-r;dx<=r;dx++){const xx=cx+dx,zz=cz+dz;if(xx>=0&&zz>=0&&xx<N&&zz<N&&!B[zz*N+xx])return zz*N+xx;}return null;};
-  const s=nearestFree(ax,az),e=nearestFree(bx,bz);if(s===null||e===null)return null;const prev=new Int32Array(N*N).fill(-1);prev[s]=s;const q=[s];
-  for(let h=0;h<q.length&&prev[e]<0;h++){const k=q[h],x=k%N,z=(k/N)|0;for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){const xx=x+dx,zz=z+dz;if(xx<0||zz<0||xx>=N||zz>=N)continue;const kk=zz*N+xx;if(prev[kk]>=0||B[kk])continue;if(dx&&dz&&(B[z*N+xx]||B[zz*N+x]))continue;prev[kk]=k;q.push(kk);}}
+function waterGrid(hazards){const B=new Uint8Array(N*NZ);
+  for(let z=0;z<NZ;z++)for(let x=0;x<N;x++){let bad=false;for(let dz=-1;dz<=1&&!bad;dz++)for(let dx=-1;dx<=1&&!bad;dx++){const xx=x+dx,zz=z+dz;if(xx<1||zz<1||xx>=N-1||zz>=NZ-1){bad=true;break;}if(terrainH((xx+.5)*CELL,(zz+.5)*CELL)>-1.2)bad=true;}B[z*N+x]=bad?1:0;}
+  hazards.forEach(h=>{const cx=Math.floor(h.x/CELL),cz=Math.floor(h.z/CELL);for(let dz=-2;dz<=2;dz++)for(let dx=-2;dx<=2;dx++){const xx=cx+dx,zz=cz+dz;if(xx>=0&&zz>=0&&xx<N&&zz<NZ)B[zz*N+xx]=1;}});return B;}
+function routeBetween(B,ax,az,bx,bz){const nearestFree=(x,z)=>{let cx=Math.floor(x/CELL),cz=Math.floor(z/CELL);for(let r=0;r<12;r++)for(let dz=-r;dz<=r;dz++)for(let dx=-r;dx<=r;dx++){const xx=cx+dx,zz=cz+dz;if(xx>=0&&zz>=0&&xx<N&&zz<NZ&&!B[zz*N+xx])return zz*N+xx;}return null;};
+  const s=nearestFree(ax,az),e=nearestFree(bx,bz);if(s===null||e===null)return null;const prev=new Int32Array(N*NZ).fill(-1);prev[s]=s;const q=[s];
+  for(let h=0;h<q.length&&prev[e]<0;h++){const k=q[h],x=k%N,z=(k/N)|0;for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){const xx=x+dx,zz=z+dz;if(xx<0||zz<0||xx>=N||zz>=NZ)continue;const kk=zz*N+xx;if(prev[kk]>=0||B[kk])continue;if(dx&&dz&&(B[z*N+xx]||B[zz*N+x]))continue;prev[kk]=k;q.push(kk);}}
   if(prev[e]<0)return null;const cells=[];for(let k=e;;k=prev[k]){cells.unshift(k);if(k===s)break;}
   const pts=cells.map(k=>({x:(k%N+.5)*CELL,z:(((k/N)|0)+.5)*CELL}));const clear=(a,b)=>{const n=Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/5);for(let i=1;i<n;i++){const x=lerp(a.x,b.x,i/n),z=lerp(a.z,b.z,i/n);if(B[Math.floor(z/CELL)*N+Math.floor(x/CELL)])return false;}return true;};
   const out=[{x:ax,z:az}];let i=0;while(i<pts.length-1){let j=pts.length-1;while(j>i+1&&!clear(pts[i],pts[j]))j--;out.push(pts[j]);i=j;}out.push({x:bx,z:bz});return out;}
 let AI_GRID=null;
 function buildAIShips(grp,harbors,hazards){const B=waterGrid(hazards),B0=waterGrid([]),ai=[];AI_GRID=B;
-  AI_ROUTES.forEach(([id,ha,hb],k)=>{if(ha>=harbors.length||hb>=harbors.length)return;const A=harbors[ha],Bh=harbors[hb];
+  AI_ROUTES.forEach(([id,ha,hb],k)=>{if(ha==='P')ha=harbors.length-1;if(hb==='P')hb=harbors.length-1;if(ha>=harbors.length||hb>=harbors.length)return;const A=harbors[ha],Bh=harbors[hb];
     // jedes Schiff bekommt einen eigenen Liegeplatz vor dem Hafen, damit sich keine Schiffe überlappen
     const src=AI_DESIGNS[id]||TEMPLATES[id];if(!src)return;const big=Math.max(0,(src.mids||1)*3-12);
     const off=(h,j)=>{const lat=((j%3)-1)*18,out=16+(j%2)*12+big;return [h.x+h.ox*out-h.oz*lat,h.z+h.oz*out+h.ox*lat];};const sa=off(A,k),sb=off(Bh,k+1);
@@ -1581,6 +1636,7 @@ function updateAI(dt,t){const fx=Math.cos(boat.h),fz=-Math.sin(boat.h);
     if(mode==='sea'){const d=Math.hypot(boat.x-a.x,boat.z-a.z);if(d<a.r+seaShip.stats.L*.4+8&&!(a.visit&&a.visit.phase==='begleiten'))a.stop=1.5;
       if(a.visit&&a.visit.phase==='begleiten'&&d<a.r+seaShip.stats.L*.4+4&&d>.1){a.x+=(a.x-boat.x)/d*dt*6;a.z+=(a.z-boat.z)/d*dt*6;}
       if(d<90&&a.greet<=0){a.greet=30;aiHorn(a,clamp(1-d/120,.25,.8),true);}}
+    if(a.z<SH+60){if(iceAhead(a.x,a.z,a.h,a.sh.L,a.sh.W))speed*=.7;iceCrush(a.x,a.z,a.h,a.sh.L,a.sh.W,Math.abs(a.x-camT.x)<300&&Math.abs(a.z-camT.z)<300);}
     const want=a.stop>0?0:speed;a.v+=clamp(want-a.v,-dt*3,dt*1.5);
     const nx=a.x+Math.cos(a.h)*a.v*dt,nz=a.z-Math.sin(a.h)*a.v*dt;if(!landAt(nx,nz)){a.x=nx;a.z=nz;}else if(a.visit&&a.visit.phase!=='zurueck')a.visit.phase='zurueck';
     const g=a.sh.group;g.position.set(a.x,Math.sin(t*1.8+a.x)*.25,a.z);g.rotation.y=a.h;a.bumpT=Math.max(0,(a.bumpT||0)-dt);a.sh.pivot.rotation.x=Math.sin(t*14)*.07*a.bumpT;
@@ -1588,18 +1644,78 @@ function updateAI(dt,t){const fx=Math.cos(boat.h),fz=-Math.sin(boat.h);
     if(Math.abs(a.x-camT.x)<380&&Math.abs(a.z-camT.z)<380){g.visible=true;animShip(a.sh,t);}else g.visible=false;});}
 // Prallt der Spieler gegen ein Computer-Schiff? (sanft, niemand sinkt)
 
+// ---------- Packeis: geschlossene Eisdecke, die jedes Schiff aufbricht (ADR-2026-11-13d) ----------
+// Eisgitter 4 × 4 Einheiten über dem Streifen; aufgebrochene Rinnen frieren nach ca. 2 Minuten langsam wieder zu.
+const IR=4,IX=Math.ceil(WORLD/IR),IZ=Math.ceil(SH/IR),ICE_A=242;
+const ICE={base:new Uint8Array(IX*IZ),a:new Uint8Array(IX*IZ),brk:new Float32Array(IX*IZ),act:new Set(),data:new Uint8Array(IX*IZ*4),tex:null,mesh:null,dirty:false,up:0,tick:0,now:0,inIce:false,crackT:0,floes:null};
+const iceIdx=(x,z)=>{const i=Math.floor(x/IR),j=Math.floor(z/IR);return (i<0||j<0||i>=IX||j>=IZ)?-1:j*IX+i;};
+function iceSetA(k,v){ICE.a[k]=v;const i=k%IX,j=(k-i)/IX;ICE.data[((IZ-1-j)*IX+i)*4+3]=v;ICE.dirty=true;}
+function iceBuild(grp){const h01=(a,b)=>{const v=Math.sin(a*127.1+b*311.7)*43758.5453;return v-Math.floor(v);};
+  const vnoise=(x,z,sc)=>{const X=x/sc,Z=z/sc,i=Math.floor(X),j=Math.floor(Z),u=X-i,v=Z-j,su=u*u*(3-2*u),sv=v*v*(3-2*v);return lerp(lerp(h01(i,j),h01(i+1,j),su),lerp(h01(i,j+1),h01(i+1,j+1),su),sv);};
+  const PS=7,seed=(gi,gj)=>[(gi+.15+.7*h01(gi*3.1,gj*1.7))*PS,(gj+.15+.7*h01(gi*1.3,gj*2.9))*PS];
+  const hb=world.harbors[world.pkHarbor];ICE.act.clear();ICE.brk.fill(0);
+  for(let j=0;j<IZ;j++)for(let i=0;i<IX;i++){const k=j*IX+i,x=(i+.5)*IR,z=(j+.5)*IR;
+    // Platten mit Rissen (Voronoi)
+    const gi=Math.floor(i/PS),gj=Math.floor(j/PS);let d1=1e9,d2=1e9,pid=0;for(let b=-1;b<=1;b++)for(let a=-1;a<=1;a++){const [sx,sz]=seed(gi+a,gj+b),d=Math.hypot(sx-i-.5,sz-j-.5);if(d<d1){d2=d1;d1=d;pid=(gi+a)*977+(gj+b);}else if(d<d2)d2=d;}
+    const crack=d2-d1<.7,sh=(h01(pid,7)-.5)*.07+(vnoise(x,z,40)-.5)*.06;let r=.93+sh,g=.96+sh,bb=.99+sh*.5;if(crack){r=.74;g=.83;bb=.9;}else if(d2-d1<1.4){r-=.03;g-=.02;}
+    const t=((j*IX+i)*4)>>0,row=((IZ-1-j)*IX+i)*4;ICE.data[row]=clamp(r,0,1)*255;ICE.data[row+1]=clamp(g,0,1)*255;ICE.data[row+2]=clamp(bb,0,1)*255;
+    // wo Eis liegt: Wasser, nicht im Hafenbecken, zur Eisregion hin in Schollen ausfransend
+    let ok=terrainH(x,z)<-.45&&terrainH(x+3,z)<.1&&terrainH(x-3,z)<.1&&terrainH(x,z+3)<.1&&terrainH(x,z-3)<.1;
+    if(ok&&Math.hypot(x-hb.x,z-hb.z)<52+vnoise(x,z,14)*18)ok=false;
+    const fr=(z-(SH-140))/140;let av=ICE_A;if(ok&&fr>0){const v=vnoise(x,z,26)*.85+vnoise(x,z,9)*.15-fr*1.05;av=v<=0?0:Math.min(ICE_A,Math.round(v*ICE_A*7));}
+    ICE.base[k]=ok?av:0;ICE.a[k]=ICE.base[k];ICE.data[row+3]=ICE.base[k];}
+  if(!ICE.tex){ICE.tex=new THREE.DataTexture(ICE.data,IX,IZ,THREE.RGBAFormat);ICE.tex.magFilter=THREE.LinearFilter;ICE.tex.minFilter=THREE.LinearFilter;ICE.tex.generateMipmaps=false;}
+  ICE.tex.needsUpdate=true;const pg=new THREE.PlaneGeometry(WORLD,SH,1,1);pg.rotateX(-Math.PI/2);
+  ICE.mesh=new THREE.Mesh(pg,new THREE.MeshLambertMaterial({map:ICE.tex,transparent:true,depthWrite:false}));ICE.mesh.position.set(WORLD/2,.95,SH/2);ICE.mesh.renderOrder=1;grp.add(ICE.mesh);
+  // Schollen: aufgebrochene Eisstücke, kippen weg, treiben in der Rinne und sinken später
+  const fg=new THREE.CylinderGeometry(1,1.12,.6,6);const NF=320,im=new THREE.InstancedMesh(fg,new THREE.MeshLambertMaterial({color:'#f2f8fc'}),NF);im.renderOrder=2;
+  const m4=new THREE.Matrix4();m4.makeScale(0,0,0);for(let q=0;q<NF;q++)im.setMatrixAt(q,m4);grp.add(im);
+  ICE.floes={im,n:NF,next:0,alive:0,F:Array.from({length:NF},()=>({life:0}))};world.ice=ICE;}
+function floeSpawn(x,z,vx,vz){const L=ICE.floes;if(!L)return;const f=L.F[L.next];L.next=(L.next+1)%L.n;if(f.life<=0)L.alive++;
+  Object.assign(f,{x,z,vx:vx*(.6+Math.random()*.8),vz:vz*(.6+Math.random()*.8),ry:Math.random()*6.3,tilt:.8+Math.random()*.6,tx:Math.random()<.5?1:-1,s:1+Math.random()*1.5,life:45+Math.random()*25,y:.7});}
+// Wie viel geschlossenes Eis liegt direkt vor dem Bug?
+function iceAhead(x,z,h,L,W){if(!ICE.mesh||z>SH+40)return false;const fx=Math.cos(h),fz=-Math.sin(h),px=-fz,pz=fx;let n=0;for(const s of [-.4,0,.4]){const k=iceIdx(x+fx*(L/2+3)+px*s*W,z+fz*(L/2+3)+pz*s*W);if(k>=0&&ICE.a[k]>128)n++;}return n>=2;}
+// Rumpf bricht das Eis unter sich auf; am Bug entstehen Schollen
+function iceCrush(x,z,h,L,W,fx2){if(!ICE.mesh||z>SH+40)return 0;const fx=Math.cos(h),fz=-Math.sin(h),px=-fz,pz=fx,hl=L/2,hw=W/2+1.5;let n=0;
+  for(let t=-hl;t<=hl+2;t+=2)for(let s=-hw;s<=hw;s+=2){const wx=x+fx*t+px*s,wz=z+fz*t+pz*s,k=iceIdx(wx,wz);if(k<0||ICE.a[k]<60)continue;
+    iceSetA(k,0);ICE.brk[k]=ICE.now;ICE.act.add(k);n++;if(fx2&&Math.random()<.45){const sd=s>=0?1:-1;floeSpawn(wx+px*sd*1.5,wz+pz*sd*1.5,px*sd*4-fx*.5,pz*sd*4-fz*.5);}}
+  return n;}
+function iceCrackSound(v){noise(.08,.18+.4*v,2600);noise(.22,.1+.25*v,700,.03);tone({f:95,f2:48,t:.2,type:'triangle',v:.08+.22*v});}
+function iceOwn(dt,L){ICE.inIce=false;if(!ICE.mesh||boat.z>SH+60)return;const W=seaShip.W||6,back=boat.v<-.2;
+  ICE.inIce=Math.abs(boat.v)>.3&&iceAhead(boat.x,boat.z,boat.h+(back?Math.PI:0),L,W);
+  const n=iceCrush(boat.x,boat.z,boat.h,L,W,true);ICE.crackT-=dt;if(n>0&&ICE.crackT<=0){ICE.crackT=.25+Math.random()*.25;iceCrackSound(Math.min(1,n/8));}}
+function iceUpdate(dt){if(!ICE.mesh)return;ICE.now+=dt;ICE.tick-=dt;
+  if(ICE.tick<=0){ICE.tick=.25;for(const k of ICE.act){const e=ICE.now-ICE.brk[k];if(e<90)continue;const f=Math.min(1,(e-90)/30);iceSetA(k,Math.round(ICE.base[k]*f));if(f>=1)ICE.act.delete(k);}}
+  ICE.up-=dt;if(ICE.dirty&&ICE.up<=0){ICE.up=.08;ICE.dirty=false;ICE.tex.needsUpdate=true;}
+  const L=ICE.floes;if(!L||!L.alive)return;const m4=ICE._m4||(ICE._m4=new THREE.Matrix4()),q4=ICE._q||(ICE._q=new THREE.Quaternion()),e3=ICE._e||(ICE._e=new THREE.Euler()),v3=ICE._v||(ICE._v=new THREE.Vector3()),s3=ICE._s||(ICE._s=new THREE.Vector3());
+  for(let q=0;q<L.n;q++){const f=L.F[q];if(f.life<=0)continue;f.life-=dt;if(f.life<=0){L.alive--;m4.makeScale(0,0,0);L.im.setMatrixAt(q,m4);continue;}
+    f.x+=f.vx*dt;f.z+=f.vz*dt;const dmp=Math.exp(-dt*.9);f.vx*=dmp;f.vz*=dmp;f.tilt*=Math.exp(-dt*1.6);const k=iceIdx(f.x,f.z);if(k>=0&&ICE.a[k]>180&&f.life>3)f.life=3;
+    const y=f.life<4?.55-(4-f.life)*.35:.55+Math.sin(ICE.now*1.7+q)*.08;e3.set(f.tilt*f.tx+Math.sin(ICE.now*1.3+q)*.05,f.ry,Math.sin(ICE.now+q)*.05);q4.setFromEuler(e3);v3.set(f.x,y,f.z);s3.set(f.s,1,f.s*.8);m4.compose(v3,q4,s3);L.im.setMatrixAt(q,m4);}
+  L.im.instanceMatrix.needsUpdate=true;}
+// Forschungsstation: rote Container-Module auf Stelzen, Radarkuppel, Funkmast
+function mkStation(){const g=new THREE.Group(),red='#d63a2f';
+  [[0,0,16,8],[15,4,10,8],[-6,-11,10,7]].forEach(([x,z,w,d],k)=>{[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b])=>g.add(cylm(.35,.35,2.4,'#5c636b',x+a*(w/2-1),1.2,z+b*(d/2-1),6)));
+    g.add(box(w,4.4,d,red,x,4.6,z));g.add(box(w+.3,.5,d+.3,'#ffffff',x,7,z));for(let q=0;q<Math.floor(w/3.2);q++)g.add(box(1.6,1.2,.15,'#2a3b4f',x-w/2+2.2+q*3.2,5.2,z+d/2+.05));});
+  g.add(box(4,1.6,2.2,'#e8e3d8',8,5,2));
+  const tw=cylm(1.4,1.6,6,'#e8e3d8',-14,3,6,10);g.add(tw);const dome=new THREE.Mesh(new THREE.SphereGeometry(3.6,14,10),phong('#ffffff',{shininess:60}));dome.position.set(-14,8.6,6);g.add(dome);
+  for(let k=0;k<6;k++)g.add(cylm(.3,.3,3,k%2?'#e8473c':'#ffffff',4,1.5+k*3,-6,6));g.add(box(4,.2,.2,'#e8e3d8',4,15.5,-6));
+  g.add(cylm(.12,.12,7,'#e8e3d8',-3,3.5,8,5));const fl=box(2.6,1.6,.1,'#2f8fd0',-1.6,6.2,8);g.add(fl);g.userData.flag=fl;
+  [[10,-8,'#ff7a1a'],[13,-9,'#ffd23f']].forEach(([x,z,c])=>{const sm=new THREE.Group();sm.position.set(x,0,z);sm.add(box(2.4,.8,1.2,c,0,.7,0));sm.add(box(.8,.7,1,'#22314a',-.2,1.3,0));sm.add(box(3,.15,.3,'#5c636b',0,.2,.5));sm.add(box(3,.15,.3,'#5c636b',0,.2,-.5));g.add(sm);});
+  return g;}
+function buildStation(grp,at){const g=mkStation(),y=Math.max(1.5,terrainH(at[0],at[1]));g.position.set(at[0],y-.3,at[1]);g.scale.setScalar(1.25);grp.add(g);}
+
 // ---------- Welt zusammenbauen ----------
 function buildWorld(map){
   if(world){seaScene.remove(world.group);world.group.traverse(o=>{if(o.geometry)o.geometry.dispose();});}
-  MAP=map;const grp=new THREE.Group();seaScene.add(grp);
-  for(let i=0;i<N*N;i++)LAND[i]=map.land.charCodeAt(i)===49?1:0;REGION=map.region;buildIslands();
-  const net=planNetwork(map);buildHeights(net);buildTerrain(grp);
+  MAP=map;const xm=extendMap(map);const grp=new THREE.Group();seaScene.add(grp);
+  for(let i=0;i<N*NZ;i++)LAND[i]=xm.land.charCodeAt(i)===49?1:0;REGION=xm.region;buildIslands();
+  const net=planNetwork(xm);buildHeights(net);buildTerrain(grp);
   // Freihalten: Dörfer, Bahnhöfe, Straßen
   const keep=[...net.villages.map(v=>({x:v.x,z:v.z,r:v.r+16})),...net.flats.map(f=>({x:f.x,z:f.z,r:f.r})),...net.roads.flat().filter((p,i)=>i%2===0).map(p=>({x:p.x,z:p.z,r:9})),...net.rails.flat().map(p=>({x:p.x,z:p.z,r:9}))];
   const free=(x,z)=>!keep.some(k=>Math.abs(k.x-x)<k.r&&Math.abs(k.z-z)<k.r&&Math.hypot(k.x-x,k.z-z)<k.r);
   const r=rng(3),m4=new THREE.Matrix4(),col=new THREE.Color();
   const veg={leaf:[],pine:[],bush:[],palm:[],snow:[],rock:[],dead:[],lava:[]};
-  for(let z=0;z<N;z++)for(let x=0;x<N;x++){if(!LAND[z*N+x])continue;const rg=REGION[z*N+x];
+  for(let z=0;z<NZ;z++)for(let x=0;x<N;x++){if(!LAND[z*N+x])continue;const rg=REGION[z*N+x];
     const px=x*CELL+CELL/2+(r()-.5)*6,pz=z*CELL+CELL/2+(r()-.5)*6,h=terrainH(px,pz),sc=.7+r()*.6,q=r();if(h<1.3||!free(px,pz))continue;const coast=h<2.2;
     if(rg==='h'){if(!coast&&q<.36)veg.leaf.push([px,h,pz,sc]);else if(!coast&&q<.5)veg.pine.push([px,h,pz,sc,'#2f7a46']);else if(q<.68)veg.bush.push([px,h,pz,sc,'#5fae4a']);}
     else if(rg==='t'){if(q<(coast?.32:.48))veg.palm.push([px,h,pz,sc,r()*6.28]);else if(!coast&&q<.68)veg.bush.push([px,h,pz,sc*1.2,'#2fae47']);}
@@ -1636,26 +1752,27 @@ function buildWorld(map){
   if(veg.lava.length){const lim=new THREE.InstancedMesh(lavaG,new THREE.MeshBasicMaterial({color:'#ff6a1f'}),veg.lava.length);veg.lava.forEach((p,i)=>{at(p,p[3],1,p[3]*.7,0,p[0])(m4);lim.setMatrixAt(i,m4);});lim.instanceMatrix.needsUpdate=true;grp.add(lim);}
   {const ng=new THREE.Group();buildNetworkMeshes(ng,net);mergeStatic(ng,[]);grp.add(ng);}
   // Häfen
-  const harbors=map.harbors.map((h,i)=>{const hx=Math.floor(h.x/CELL),hz=Math.floor(h.z/CELL);let best=null,bd=1e9;
+  const harbors=xm.harbors.map((h,i)=>{const hx=Math.floor(h.x/CELL),hz=Math.floor(h.z/CELL);let best=null,bd=1e9;
     for(let dz=-6;dz<=6;dz++)for(let dx=-6;dx<=6;dx++){const cx=(hx+dx+.5)*CELL,cz=(hz+dz+.5)*CELL;if(terrainH(cx,cz)>.8){const d=Math.hypot(cx-h.x,cz-h.z);if(d<bd){bd=d;best=[cx,cz,terrainH(cx,cz)];}}}
     const V=best||[h.x+12,h.z,1.5];let ox=h.x-V[0],oz=h.z-V[1];const ol=Math.hypot(ox,oz)||1;ox/=ol;oz/=ol;
     const hm=harborMesh(regionAt(h.x,h.z),V,[h.x,h.z],ox,oz,V[2]);grp.add(hm.group);if(visited.has(i)){hm.flag.material.color.set('#3fbf6a');hm.check.visible=true;}
     return {x:h.x,z:h.z,ox,oz,spawn:[h.x+ox*16,h.z+oz*16],heading:Math.atan2(-oz,ox),flag:hm.flag,check:hm.check,pier:hm.pierEnd,land:[V[0],V[1]]};});
   // Gefahren
-  const hazards=map.hazards.filter(h=>HAZ[h.t]).map(h=>{const m=hazardMesh(h.t);m.group.position.set(h.x,0,h.z);m.group.rotation.y=(h.x*7+h.z*3)%6;grp.add(m.group);const rank=Math.abs(Math.sin(h.x*12.9898+h.z*78.233)*43758.5453)%1;return {t:h.t,x:h.x,z:h.z,r:HAZ[h.t].r,group:m.group,pulse:m.pulse,rank,active:true};});
+  const hazards=xm.hazards.filter(h=>HAZ[h.t]).map(h=>{const m=hazardMesh(h.t);m.group.position.set(h.x,0,h.z);m.group.rotation.y=(h.x*7+h.z*3)%6;grp.add(m.group);const rank=Math.abs(Math.sin(h.x*12.9898+h.z*78.233)*43758.5453)%1;return {t:h.t,x:h.x,z:h.z,r:HAZ[h.t].r,group:m.group,pulse:m.pulse,rank,active:true};});
   // Brücken, Fahrzeuge, Computer-Schiffe
-  const bridges=(map.bridges||[]).map(b=>{const br=buildBridge(b);grp.add(br.group);return br;});
+  const bridges=xm.bridges.map(b=>{const br=buildBridge(b);grp.add(br.group);return br;});
   const vehicles=buildVehicles(grp,net);
-  world={group:grp,harbors,hazards,finds:[],bridges,vehicles,ai:[]};
+  world={group:grp,harbors,hazards,finds:[],bridges,vehicles,ai:[],pkHarbor:xm.pkHarbor};
+  try{buildStation(grp,xm.station);iceBuild(grp);}catch(err){showErr('Packeis: '+(err.stack||err.message).split('\n').slice(0,2).join(' '));}
   world.ai=buildAIShips(grp,harbors,hazards);
   // Entdeckungen als Teil der Welt
-  world.finds=map.finds.filter(f=>FIND_BY_ID[f.id]).map(f=>{let C;try{C=makeCreature(f.id,f.x,f.z);}catch(err){showErr('Entdeckung '+f.id+': '+(err.stack||err.message).split('\n').slice(0,2).join(' '));
+  world.finds=xm.finds.filter(f=>FIND_BY_ID[f.id]).map(f=>{let C;try{C=makeCreature(f.id,f.x,f.z);}catch(err){showErr('Entdeckung '+f.id+': '+(err.stack||err.message).split('\n').slice(0,2).join(' '));
       C={id:f.id,home:{x:f.x,z:f.z},x:f.x,z:f.z,group:new THREE.Group(),top:8,kind:'still',parts:{}};const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:emojiTex(FIND_BY_ID[f.id].e),depthWrite:false}));sp.scale.set(12,12,1);sp.position.y=6;C.group.add(sp);C.group.position.set(f.x,0,f.z);}
     grp.add(C.group);makeMarks(grp,C);return C;});
   try{buildZoneLife(grp);}catch(err){showErr('Zonen: '+err.message);}
   waterSnap=null;applyHazardPct();refreshFindMarks();
 }
-function updateWorldLife(dt,t){updateHornWaves(dt);updateZoneLife(dt,t);world.finds.forEach(C=>{updateCreature(C,t,dt);if(Math.abs(C.x-camT.x)<400&&Math.abs(C.z-camT.z)<400)updateMarks(C,t,dt);});
+function updateWorldLife(dt,t){updateHornWaves(dt);iceUpdate(dt);updateZoneLife(dt,t);world.finds.forEach(C=>{updateCreature(C,t,dt);if(Math.abs(C.x-camT.x)<400&&Math.abs(C.z-camT.z)<400)updateMarks(C,t,dt);});
   updateVehicles(world.vehicles,t);world.bridges.forEach(updateBridge);updateAI(dt,t);}
 
 // Bläschen beim Sinken
@@ -1792,7 +1909,7 @@ function steerBoat(dt,hit){const st=seaShip.stats,L=st.L;
       const near=L*.5+6;if(!boat.rev&&Math.abs(err)>2.0&&dist<170)boat.rev=true;else if(boat.rev&&Math.abs(err)<1.2)boat.rev=false;
       if(boat.rev){let eb=err-Math.sign(err)*Math.PI;eb=Math.atan2(Math.sin(eb),Math.cos(eb));wEff=clamp(eb/.7,-1,1)*150;tf=dist<near?0:-clamp((dist-near)/40,.5,1)*.3;}
       else{wEff=clamp(-err/.7,-1,1)*150;tf=dist<near?0:clamp((dist-near)/60,.3,1)*(Math.abs(err)>1.6?.4:1);}}else{wEff=0;tf=0;boat.rev=false;}}
-  const target=tf*st.vmax,a=st.accel*dt;boat.v+=clamp(target-boat.v,-a*1.6,a);
+  const target=tf*st.vmax*(ICE.inIce?.7:1),a=st.accel*dt;boat.v+=clamp(target-boat.v,-a*1.6,a);
   const sf=clamp(Math.abs(boat.v)/(st.vmax*.22),0,1)*Math.sign(boat.v);
   boat.turn=lerp(boat.turn,-(wEff/150)*st.turn*sf,Math.min(1,dt*4));
   const nh=boat.h+boat.turn*dt,fx=Math.cos(nh),fz=-Math.sin(nh),nx=boat.x+fx*boat.v*dt,nz=boat.z+fz*boat.v*dt;
@@ -1800,6 +1917,7 @@ function steerBoat(dt,hit){const st=seaShip.stats,L=st.L;
   if(!hit(boat.x,boat.z,boat.h)&&hit(nx,nz,nh)){boat.v*=-.3;if(boat.bonkCD<=0){SFX.bonk();boat.bonkCD=.7;}}else{boat.x=nx;boat.z=nz;boat.h=nh;}}
 function updateSea(dt,t){const st=seaShip.stats,L=st.L;seaShip.standT=Math.abs(boat.v)<.4?(seaShip.standT||0)+dt:0;steerBoat(dt,(x,z,h)=>shipHitsLand(x,z,h,L));const fx=Math.cos(boat.h),fz=-Math.sin(boat.h);
   pushAI(L);
+  iceOwn(dt,L);
   // Gefahren
   const bx=boat.x+fx*L/2,bz=boat.z+fz*L/2,sx=boat.x-fx*L/2,sz=boat.z-fz*L/2;
   for(const hz of world.hazards){if(!hz.active)continue;const dx=hz.x-boat.x,dz=hz.z-boat.z;if(Math.abs(dx)>90||Math.abs(dz)>90){hz.pulse.visible=false;continue;}
@@ -1852,8 +1970,8 @@ function satHit(A,B){let best=1e9,ax=0,az=0;for(const P of [A,B])for(let i=0;i<P
   const ca=A.reduce((s,v)=>[s[0]+v[0],s[1]+v[1]],[0,0]),cb=B.reduce((s,v)=>[s[0]+v[0],s[1]+v[1]],[0,0]);if((cb[0]/B.length-ca[0]/A.length)*ax+(cb[1]/B.length-ca[1]/A.length)*az<0){ax=-ax;az=-az;}
   return {d:best,nx:ax,nz:az};}
 function hullOf(sh){if(!sh.hull)sh.hull=hullOutline(sh);return sh.hull;}
-function shipHitsLand(x,z,h,L){if(x<12||z<12||x>WORLD-12||z>WORLD-12)return true;const H=seaShip&&hullOf(seaShip);if(!H){const fx=Math.cos(h),fz=-Math.sin(h);for(const s of [-.5,-.25,0,.25,.5])if(landAt(x+fx*s*L,z+fz*s*L))return true;return false;}
-  for(const [px,pz] of hullWorld(H.dense,x,z,h)){if(landAt(px,pz))return true;if(px<12||pz<12||px>WORLD-12||pz>WORLD-12)return true;}return false;}
+function shipHitsLand(x,z,h,L){if(x<12||z<12||x>WORLD-12||z>WORLDZ-12)return true;const H=seaShip&&hullOf(seaShip);if(!H){const fx=Math.cos(h),fz=-Math.sin(h);for(const s of [-.5,-.25,0,.25,.5])if(landAt(x+fx*s*L,z+fz*s*L))return true;return false;}
+  for(const [px,pz] of hullWorld(H.dense,x,z,h)){if(landAt(px,pz))return true;if(px<12||pz<12||px>WORLD-12||pz>WORLDZ-12)return true;}return false;}
 // Volle Fahrt? Hebel ganz nach vorn und mind. 85 % Tempo (Halte-Steuerung: nur das Tempo)
 function fullSpeed(){const st=seaShip.stats;return boat.v>=st.vmax*.85&&(save.control==='touch'||gearIdx===0);}
 function pushAI(L){if(!world||!world.ai||!seaShip)return;const A=hullWorld(hullOf(seaShip).poly,boat.x,boat.z,boat.h);
@@ -1906,7 +2024,7 @@ $('#sinkBtn').onclick=()=>{if(mode!=='sinking')return;SFX.plop();$('#sinkBtn').h
 //  Lebendige Zonen: Vulkan, Eis, Tropen, Heimat (nur Schau, harmlos)
 // =====================================================================
 const ZONE={items:[],snow:null,gulls:null};
-function zoneSites(r,rg,test,n,minD){const out=[];let tries=0;while(out.length<n&&tries++<4000){const x=(4+r()*(N-8))*CELL,z=(4+r()*(N-8))*CELL;if(regionAt(x,z)!==rg)continue;if(!test(x,z,terrainH(x,z)))continue;if(out.some(p=>Math.hypot(p.x-x,p.z-z)<minD))continue;out.push({x,z,h:terrainH(x,z)});}return out;}
+function zoneSites(r,rg,test,n,minD){const out=[];let tries=0;while(out.length<n&&tries++<4000){const x=(4+r()*(N-8))*CELL,z=(4+r()*(NZ-8))*CELL;if(regionAt(x,z)!==rg)continue;if(!test(x,z,terrainH(x,z)))continue;if(out.some(p=>Math.hypot(p.x-x,p.z-z)<minD))continue;out.push({x,z,h:terrainH(x,z)});}return out;}
 const nearWater=(x,z,d)=>{for(let k=0;k<8;k++){const a=k/8*6.283;if(terrainH(x+Math.cos(a)*d,z+Math.sin(a)*d)<-.5)return [Math.cos(a),Math.sin(a)];}return null;};
 // Bleibt eine Runde (Ellipse) komplett im Wasser? (mit Abstand zum Ufer)
 function loopWet(x,z,rx,rz,deep){for(let k=0;k<32;k++){const a=k/32*6.283,px=x+Math.cos(a)*rx,pz=z+Math.sin(a)*rz;for(const [dx,dz] of [[0,0],[5,0],[-5,0],[0,5],[0,-5]])if(terrainH(px+dx,pz+dz)>deep)return false;}return true;}
@@ -2407,7 +2525,7 @@ function mergeStatic(G,anims,local){G.updateMatrixWorld(true);const all=[];G.tra
     const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.BufferAttribute(P,3));bg.setAttribute('normal',new THREE.BufferAttribute(Nn,3));bg.setAttribute('uv',new THREE.BufferAttribute(U,2));
     const m=new THREE.Mesh(bg,gp.m);m.matrixAutoUpdate=false;G.add(m);});
   return merged;}
-function buildHarbor(i){const r=rng(1000+i*7919),hx=world.harbors[i],rg=regionAt(hx.x,hx.z),R=REG[rg],G=new THREE.Group(),rects=[],pois=[],anims=[],berths=[];_p2r=r;
+function buildHarbor(i){const r=rng(1000+i*7919),hx=world.harbors[i],rg=regionAt(hx.x,hx.z),R=hx.z<SH?REG.p:REG[rg],G=new THREE.Group(),rects=[],pois=[],anims=[],berths=[];_p2r=r;
   const pick=a=>a[Math.floor(r()*a.length)],W=300+Math.floor(r()*4)*20,D=220+Math.floor(r()*3)*20,mouth=90+Math.floor(r()*3)*10,QH=2.2,N0=-D/2,S0=D/2;
   const conc=rg==='v'?'#7a716a':rg==='e'?'#b6c0c8':'#b3ab9f',wallC=rg==='v'?'#4a433e':'#7d776c',snow=rg==='e';
   const quay=(x0,z0,x1,z1)=>{rects.push({x0,z0,x1,z1});G.add(texBox(x1-x0,QH+6,z1-z0,'concrete',conc,(x0+x1)/2,QH-(QH+6)/2,(z0+z1)/2,16));G.add(box(x1-x0+.8,3.4,z1-z0+.8,wallC,(x0+x1)/2,-.6,(z0+z1)/2));};
@@ -2533,8 +2651,9 @@ function buildHarbor(i){const r=rng(1000+i*7919),hx=world.harbors[i],rg=regionAt
   };
   const order=['speicher','hafenamt','silo','buero','halde','speicher','kantine','wasserturm','parkplatz','park','buero','speicher','park'];let oi=Math.floor(r()*order.length);
   while(bx<W/2+140){if(bx>cyx-70&&bx<cyx+34){bx=cyx+34;continue;}const k=order[oi++%order.length];const used=B[k](0);zones.push({k,x:bx});bx+=used+4+r()*6;}
+  if(hx.z<SH){const st=mkStation();st.position.set(-W/2-105,QH,N0-152);st.scale.setScalar(1.3);A(st);[[-W/2-40,N0-160],[W/2+120,N0-160]].forEach(([x,z])=>{const t=new THREE.Mesh(new THREE.IcosahedronGeometry(9,0),phong('#e9f7ff',{shininess:80}));t.position.set(x,QH+2,z);t.scale.y=.7;A(t);});}
   // Windräder ganz hinten
-  for(let k=0;k<2+Math.floor(r()*2);k++){const g=new THREE.Group();g.position.set(-W/2-120+k*(W+240)/3+r()*20,QH,N0-158);g.add(cylm(.9,1.6,44,'#d8d4cc',0,22,0,10));const hub=new THREE.Group();hub.position.set(0,44,1.6);g.add(box(2,2,4.5,'#d8d4cc',0,44,0));
+  else for(let k=0;k<2+Math.floor(r()*2);k++){const g=new THREE.Group();g.position.set(-W/2-120+k*(W+240)/3+r()*20,QH,N0-158);g.add(cylm(.9,1.6,44,'#d8d4cc',0,22,0,10));const hub=new THREE.Group();hub.position.set(0,44,1.6);g.add(box(2,2,4.5,'#d8d4cc',0,44,0));
     for(let b=0;b<3;b++){const bl=box(1.2,17,.4,'#d8d4cc',0,8.5,0);const a=new THREE.Group();a.rotation.z=b*Math.PI*2/3;a.add(bl);hub.add(a);}g.add(hub);A(g);anims.push(t=>{hub.rotation.z=t*1.1+k;});}
   // Westkai: Fischmarkt mit Markthalle, Ständen und Fischkuttern
   const yz=yards[0].z,fz0=yz+30,fz1=S0+34;
@@ -2645,35 +2764,35 @@ function decorateModal(){const m=document.querySelector('#modalRoot .modal');if(
   x.className='xbtn';x.textContent='✕';x.setAttribute('aria-label','Schließen');wrap.appendChild(x);
   let downOut=false;m.addEventListener('pointerdown',e=>{downOut=e.target===m;});m.addEventListener('click',e=>{if(e.target===m&&downOut){downOut=false;x.click();}});}
 new MutationObserver(decorateModal).observe(document.getElementById('modalRoot'),{childList:true});
-function openAlbum(){SFX.tap();openLayer();const rows=REG_ORDER.map(r=>`<div class="album-row"><div class="ricon">${REG[r].icon}</div>${FINDS.filter(f=>f.r===r).map(f=>stk(f.id,f.e)).join('')}</div>`).join('')+`<div class="album-row"><div class="ricon">🗺️</div>${harborIds().map((id,i)=>`<div class="stk hb ${stickers.has(id)?'found':'locked'}" style="background:${harborLook(i)}"><span>⚓</span></div>`).join('')}</div>`+(hazOn()?`<div class="album-row"><div class="ricon">⚠️</div>${STICKER_EXTRA.filter(x=>x.id!=='welt').map(x=>stk(x.id,x.e)).join('')}</div>`:'')+`<div class="album-row"><div class="ricon">🌍</div>${stk('welt','🏆')}</div>`;
+function openAlbum(){SFX.tap();openLayer();const rows=[...REG_ORDER,'p'].map(r=>`<div class="album-row"><div class="ricon">${REG[r].icon}</div>${FINDS.filter(f=>f.r===r).map(f=>stk(f.id,f.e)).join('')}</div>`).join('')+`<div class="album-row"><div class="ricon">🗺️</div>${harborIds().map((id,i)=>`<div class="stk hb ${stickers.has(id)?'found':'locked'}" style="background:${harborLook(i)}"><span>⚓</span></div>`).join('')}</div>`+(hazOn()?`<div class="album-row"><div class="ricon">⚠️</div>${STICKER_EXTRA.filter(x=>x.id!=='welt').map(x=>stk(x.id,x.e)).join('')}</div>`:'')+`<div class="album-row"><div class="ricon">🌍</div>${stk('welt','🏆')}</div>`;
   $('#modalRoot').innerHTML=`<div class="modal"><div class="card"><button class="round closeX" id="mClose" aria-label="Schließen">✖️</button><div class="album-head">⭐ ${ownedCount()} / ${allStickers().length}</div>${rows}</div></div>`;$('#mClose').onclick=closeModal;}
 const stk=(id,e)=>`<div class="stk ${stickers.has(id)?'found':'locked'}"><span>${e}</span></div>`;
 $('#albumBtn').onclick=openAlbum;
 // Karte: wo bin ich, was ist schon erkundet (Nebel = noch unbekannt)
 let mapBase=null,mapBaseWorld=null,mapTimer=null;
-function openMap(){if(!world)return;SFX.tap();openLayer();const S=Math.floor(Math.min(innerWidth*.9,innerHeight*.86)),W=S*2,k=W/N;
+function openMap(){if(!world)return;SFX.tap();openLayer();const S=Math.floor(Math.min(innerWidth*.9,innerHeight*.86)),W=S*2,k=W/(N+NZ);
   $('#modalRoot').innerHTML=`<div class="modal"><div class="card mapcard"><button class="round closeX" id="mClose" aria-label="Schließen">✖️</button><canvas id="mapCv" width="${W}" height="${W}" style="width:${S}px;height:${S}px;display:block;border-radius:24px"></canvas></div></div>`;
   $('#mClose').onclick=()=>{clearInterval(mapTimer);mapTimer=null;closeModal();};
   // Landschaft nur einmal pro Welt berechnen
-  if(mapBaseWorld!==world){const off=document.createElement('canvas');off.width=off.height=N;const ox=off.getContext('2d'),img=ox.createImageData(N,N),c=new THREE.Color();
-    for(let j=0;j<N;j++)for(let i=0;i<N;i++){const h=terrainH((i+.5)*CELL,(j+.5)*CELL),rg=REGION[j*N+i]||'h',R=REG[rg];let col;
-      if(h>.15)col=h<1.2?R.sand:(h>9?(rg==='e'||h>13?'#f4f8fb':(rg==='v'?'#3b3330':'#8d9289')):R.land);else col=R.water;c.set(col);if(h<=.15)c.offsetHSL(0,0,clamp(h*.02,-.08,.06));else c.offsetHSL(0,0,-clamp(h*.008,0,.08));
+  if(mapBaseWorld!==world){const off=document.createElement('canvas');off.width=N;off.height=NZ;const ox=off.getContext('2d'),img=ox.createImageData(N,NZ),c=new THREE.Color();
+    for(let j=0;j<NZ;j++)for(let i=0;i<N;i++){const h=terrainH((i+.5)*CELL,(j+.5)*CELL),rg=REGION[j*N+i]||'h',R=REG[rg];let col;
+      if(h>.15)col=h<1.2?R.sand:(h>9?(rg==='e'||h>13?'#f4f8fb':(rg==='v'?'#3b3330':'#8d9289')):R.land);else col=j<NS?(world.ice&&world.ice.base[Math.floor((j+.5)*CELL/IR)*IX+Math.floor((i+.5)*CELL/IR)]?'#f7fbfe':REG.p.water):R.water;c.set(col);if(h<=.15)c.offsetHSL(0,0,clamp(h*.02,-.08,.06));else c.offsetHSL(0,0,-clamp(h*.008,0,.08));
       const p=(j*N+i)*4;img.data[p]=c.r*255;img.data[p+1]=c.g*255;img.data[p+2]=c.b*255;img.data[p+3]=255;}
     ox.putImageData(img,0,0);mapBase=off;mapBaseWorld=world;}
   $('#mapCv').style.transform=`rotate(${seaYaw}rad)`;
-  const cv=$('#mapCv'),x=cv.getContext('2d'),fog=document.createElement('canvas');fog.width=fog.height=FOG_N;const fx=fog.getContext('2d'),fd=fx.createImageData(FOG_N,FOG_N);
-  const rot=()=>{x.translate(W/2,W/2);x.rotate(Math.PI/4);x.scale(Math.SQRT1_2,Math.SQRT1_2);x.translate(-W/2,-W/2);};
-  const P=(wx,wz)=>{const u=wx/CELL*k-W/2,v=wz/CELL*k-W/2;return [W/2+(u-v)/2,W/2+(u+v)/2];},seen=(wx,wz)=>explored[clamp(Math.floor(wz/FOG_CELL),0,FOG_N-1)*FOG_N+clamp(Math.floor(wx/FOG_CELL),0,FOG_N-1)];
+  const cv=$('#mapCv'),x=cv.getContext('2d'),fog=document.createElement('canvas');fog.width=FOG_N;fog.height=FOG_NZ;const fx=fog.getContext('2d'),fd=fx.createImageData(FOG_N,FOG_NZ);
+  const rot=()=>{x.transform(k,k,-k,k,NZ*k,0);},cu=1/(k*Math.SQRT2); // Zeichnen in Zellen
+  const P=(wx,wz)=>{const u=wx/CELL,v=wz/CELL;return [(u-v)*k+NZ*k,(u+v)*k];},seen=(wx,wz)=>explored[clamp(Math.floor(wz/FOG_CELL),0,FOG_NZ-1)*FOG_N+clamp(Math.floor(wx/FOG_CELL),0,FOG_N-1)];
   // Karte läuft live mit, solange sie offen ist (das Schiff fährt im Hintergrund weiter)
-  const draw=()=>{draw0();if(!document.body.contains(cv))return;const m=W*.012;x.save();rot();x.setLineDash([W*.025,W*.016]);x.lineWidth=W*.008;x.strokeStyle='rgba(120,20,10,.35)';x.strokeRect(m+2,m+2,W-2*m,W-2*m);x.strokeStyle='#e0503a';x.strokeRect(m,m,W-2*m,W-2*m);x.restore();};
+  const draw=()=>{draw0();if(!document.body.contains(cv))return;const m=1.1;x.save();rot();x.setLineDash([W*.025*cu,W*.016*cu]);x.lineWidth=W*.008*cu;x.strokeStyle='rgba(120,20,10,.35)';x.strokeRect(m+.2,m+.2,N-2*m,NZ-2*m);x.strokeStyle='#e0503a';x.strokeRect(m,m,N-2*m,NZ-2*m);x.restore();};
   const draw0=()=>{if(!document.body.contains(cv)){clearInterval(mapTimer);mapTimer=null;return;}
-    x.imageSmoothingEnabled=true;x.fillStyle='#1f5276';x.fillRect(0,0,W,W);x.save();rot();x.drawImage(mapBase,0,0,W,W);x.restore();x.textAlign='center';x.textBaseline='middle';x.lineWidth=W*.004;x.strokeStyle='#22314a';
+    x.imageSmoothingEnabled=true;x.fillStyle='#1f5276';x.fillRect(0,0,W,W);x.save();rot();x.drawImage(mapBase,0,0,N,NZ);x.restore();x.textAlign='center';x.textBaseline='middle';x.lineWidth=W*.004;x.strokeStyle='#22314a';
     world.harbors.forEach((h,i)=>{if(!seen(h.x,h.z))return;const [px,py]=P(h.x,h.z),r=W*.022;x.beginPath();x.arc(px,py,r,0,7);x.fillStyle=visited.has(i)?'#3fbf6a':'#ffffff';x.fill();x.stroke();x.font=`${r*1.2}px sans-serif`;x.fillText('⚓',px,py+1);});
     world.ai.forEach(a=>{if(a.sunk||!seen(a.x,a.z))return;const [px,py]=P(a.x,a.z);x.beginPath();x.arc(px,py,W*.007,0,7);x.fillStyle='#ffffff';x.fill();x.stroke();});
     (save.wrecks||[]).forEach(w=>{if(!seen(w.x,w.z))return;const [px,py]=P(w.x,w.z),u=W*.012;x.save();x.translate(px,py);if(w.own){x.beginPath();x.arc(0,0,u*2.3,0,7);x.lineWidth=W*.005;x.strokeStyle='#ffd23f';x.stroke();}
       x.rotate(-.35);x.beginPath();x.moveTo(-u*1.6,0);x.lineTo(u*1.6,0);x.lineTo(u*1.1,u*.8);x.lineTo(-u*1.1,u*.8);x.closePath();x.fillStyle='#4a3a2e';x.fill();x.lineWidth=W*.0025;x.strokeStyle='#22314a';x.stroke();x.beginPath();x.moveTo(-u*.2,0);x.lineTo(-u*.2,-u*1.4);x.lineTo(u*.6,-u*.9);x.strokeStyle='#22314a';x.stroke();x.restore();});
     x.font=`${W*.032}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;world.finds.forEach(f=>{if(!stickers.has(f.id))return;const [px,py]=P(f.x,f.z);x.fillText(FIND_BY_ID[f.id].e,px,py);});
-    for(let i=0;i<FOG_N*FOG_N;i++){fd.data[i*4]=226;fd.data[i*4+1]=234;fd.data[i*4+2]=240;fd.data[i*4+3]=explored[i]?0:240;}fx.putImageData(fd,0,0);x.save();rot();x.drawImage(fog,0,0,W,W);x.restore();
+    for(let i=0;i<FOG_N*FOG_NZ;i++){fd.data[i*4]=226;fd.data[i*4+1]=234;fd.data[i*4+2]=240;fd.data[i*4+3]=explored[i]?0:240;}fx.putImageData(fd,0,0);x.save();rot();x.drawImage(fog,0,0,N,NZ);x.restore();
     const [bx,by]=mode==='harbor'&&HB?P(world.harbors[HB.idx].x,world.harbors[HB.idx].z):P(boat.x,boat.z),a=Math.atan2(-Math.sin(boat.h),Math.cos(boat.h))+Math.PI/4,pulse=1+.15*Math.sin(performance.now()/250);x.save();x.translate(bx,by);x.beginPath();x.arc(0,0,W*.04*pulse,0,7);x.fillStyle='rgba(255,210,63,.35)';x.fill();
     x.rotate(a);x.beginPath();x.moveTo(W*.035,0);x.lineTo(-W*.022,W*.022);x.lineTo(-W*.01,0);x.lineTo(-W*.022,-W*.022);x.closePath();x.fillStyle='#ffd23f';x.fill();x.lineWidth=W*.005;x.stroke();x.restore();};
   clearInterval(mapTimer);draw();mapTimer=setInterval(draw,150);}
@@ -2995,7 +3114,7 @@ function charSVG(o,vb){o=Object.assign({},DEFAULT_OUTFIT,o||{});const g=k=>(OUTF
 function loadProfile(id){currentProfile=id;LS.set('kw.profile.cur',id);SAVE_KEY='kw.save.'+id;save=normalizeSave(LS.get(SAVE_KEY));
   design=migrateDesign(save.design||clone(DEFAULT_DESIGN));save.design=design;undoStack=[];cargoToTops(save.lastHarbor||0);ensureShips();
   stickers.clear();(save.stickers||[]).forEach(x=>stickers.add(x));visited.clear();(save.visited||[]).forEach(x=>visited.add(x));
-  explored.fill(0);const ex=save.explored||'';if(ex.length===explored.length&&save.mapStamp===((MAP&&MAP.stamp)||0))for(let i=0;i<explored.length;i++)explored[i]=ex.charCodeAt(i)===49?1:0;inlandAll();
+  exploredLoad(save.mapStamp===((MAP&&MAP.stamp)||0));
   if(world){world.harbors.forEach((h,i)=>{const v=visited.has(i);h.flag.material.color.set(v?'#3fbf6a':'#ffd23f');h.check.visible=v;});if(save.lastHarbor>=world.harbors.length)save.lastHarbor=0;}
   if(master)master.gain.value=save.vol;syncHarborStickers();refreshFindMarks();applyHazardPct();applyControlUI();refreshFog();updateCount();}
 let startPlay=()=>{};
@@ -3102,7 +3221,7 @@ function frameInner(now){const dt=Math.min(.05,(now-last)/1000);last=now;T+=dt;W
   if(['sea','sinking','harbor','werft','kran','tauch'].includes(mode)){save.clock=(save.clock||0)+dt;clockSave+=dt;if(clockSave>20){clockSave=0;persist();}}
   if(mode==='sea'||mode==='sinking'){updateRescues(dt,T);if(mode==='sinking')placeSinkBtn();updateWrecks(dt,T);updateBreaks(dt);
     if(mode==='sea')updateSea(dt,T);else updateSinking(dt);
-    if(mode==='sea'||mode==='sinking'){const g=seaShip.group;g.position.x=boat.x;g.position.z=boat.z;if(mode==='sea'){g.position.y=Math.sin(T*2)*.25;seaShip.pivot.rotation.x=clamp(-boat.turn*boat.v*.018,-.1,.1)+Math.sin(T*1.3)*.02;}g.rotation.y=boat.h;animShip(seaShip,T);updateWake(dt,T);
+    if(mode==='sea'||mode==='sinking'){const g=seaShip.group;g.position.x=boat.x;g.position.z=boat.z;if(mode==='sea'){g.position.y=Math.sin(T*2)*.25;seaShip.pivot.rotation.x=clamp(-boat.turn*boat.v*.018,-.1,.1)+Math.sin(T*1.3)*.02+(ICE.inIce?Math.sin(T*29)*.022*Math.min(1,Math.abs(boat.v)/3):0);}g.rotation.y=boat.h;animShip(seaShip,T);updateWake(dt,T);
       if(hornNodes&&mode==='sea'){g.position.x+=(Math.random()-.5)*.3;g.position.z+=(Math.random()-.5)*.3;boat.waveT=(boat.waveT||0)-dt;if(boat.waveT<=0){boat.waveT=.28;emitHornWave(boat.x,seaShip.topY,boat.z);}}}
     const asp=innerWidth/innerHeight;camVH+=(camZoomT-camVH)*Math.min(1,dt*5);seaCam.left=-camVH*asp/2;seaCam.right=camVH*asp/2;seaCam.top=camVH/2;seaCam.bottom=-camVH/2;seaCam.updateProjectionMatrix();
     const look=mode==='sea'?1.6:0;camT.x+=(boat.x+Math.cos(boat.h)*boat.v*look-camT.x)*Math.min(1,dt*2.5);camT.z+=(boat.z-Math.sin(boat.h)*boat.v*look-camT.z)*Math.min(1,dt*2.5);
@@ -3148,7 +3267,7 @@ async function bootGame(){
   renderStart();
   startPlay=()=>{try{audioInit();musicStart();}catch(e){}const st=$('#start');if(st)st.hidden=true;FS_WANT=true;fsAgain();if(ready)go();else want=true;};
   try{buildWorld(map);}catch(err){showErr('Weltaufbau: '+(err.stack||err.message).split('\n').slice(0,3).join(' '));if(!world){try{buildWorld(genDefaultMap());}catch(e2){showErr('Weltaufbau (Standardkarte): '+e2.message);}}}
-  const ex=save.explored||'';if(!testMode&&ex.length===explored.length&&save.mapStamp===(map.stamp||0))for(let i=0;i<explored.length;i++)explored[i]=ex.charCodeAt(i)===49?1:0;inlandAll();
+  if(!testMode)exploredLoad(save.mapStamp===(map.stamp||0));
   try{syncHarborStickers();applyHazardPct();applyControlUI();refreshFog();updateCount();resize();drawWheel();}catch(err){showErr('Vorbereitung: '+err.message);}
   if(save.lastHarbor>=world.harbors.length)save.lastHarbor=0;
   requestAnimationFrame(frame);ready=true;if(want)go();
@@ -3170,7 +3289,7 @@ function bootEditor(){
   const PLACE=[['harbor','⚓ Hafen'],['eisberg','🧊 Eisberg'],['mine','💣 Seemine'],['riff','🪸 Riff'],['start','⭐ Start'],['rail','🚆 Bahnbrücke'],['road','🚗 Autobrücke'],['find','Entdeckung ↓']];
   const mkTools=(el,list)=>{el.innerHTML='';list.forEach(([id,label])=>{const b=document.createElement('button');b.className='tool';b.textContent=label;b.dataset.t=id;b.setAttribute('aria-pressed',tool===id);b.onclick=()=>{tool=id;sync();};el.appendChild(b);});};
   function sync(){mkTools($('#edPaint'),PAINT);mkTools($('#edPlace'),PLACE);const placed=new Set(map.finds.map(f=>f.id));
-    $('#edFind').innerHTML=FINDS.filter(f=>!f.ev).map(f=>`<option value="${f.id}">${placed.has(f.id)?'✔':'○'} ${f.e} ${f.id} (${{h:'Heimat',e:'Eis',t:'Tropen',v:'Vulkan'}[f.r]})</option>`).join('');$('#edFind').value=curFind;
+    $('#edFind').innerHTML=FINDS.filter(f=>!f.ev&&!f.pk).map(f=>`<option value="${f.id}">${placed.has(f.id)?'✔':'○'} ${f.e} ${f.id} (${{h:'Heimat',e:'Eis',t:'Tropen',v:'Vulkan'}[f.r]})</option>`).join('');$('#edFind').value=curFind;
     const hc={};map.hazards.forEach(h=>hc[h.t]=(hc[h.t]||0)+1);const bad=map.harbors.filter(h=>!nearLand(h.x,h.z)).length;
     $('#edStats').innerHTML=`Häfen: <b>${map.harbors.length}</b> / 8${bad?` · <span class="warn">${bad} ohne Land daneben</span>`:''}<br>Entdeckungen: <b>${placed.size}</b> / ${FINDS.length}<br>Brücken: <b>${map.bridges.length}</b><br>Eisberge <b>${hc.eisberg||0}</b> · Minen <b>${hc.mine||0}</b> · Riffe <b>${hc.riff||0}</b>${map.stamp?`<br>Zuletzt veröffentlicht: ${new Date(map.stamp).toLocaleString('de-DE')}`:''}`;draw();}
   let curFind=FINDS[0].id;$('#edFind').onchange=e=>{curFind=e.target.value;tool='find';sync();};
