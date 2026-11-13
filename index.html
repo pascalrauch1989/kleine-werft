@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"><meta name="theme-color" content="#2f8fd0"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
-<script>window.KW_APP=1;window.KW_VERSION="66";</script>
+<script>window.KW_APP=1;window.KW_VERSION="67";</script>
 <title>Kleine Werft</title>
 <style>@font-face{font-family:"Fredoka";src:url("fonts/Fredoka.ttf") format("truetype");font-weight:300 700;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype");font-weight:700;font-display:swap}</style>
 <style>
@@ -447,7 +447,7 @@ const NOTE_IDX={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,A
 function nf(n){if(n==='R')return 0;const m=n.match(/^([A-G](?:#|b)?)(\d)$/);return m?440*Math.pow(2,(NOTE_IDX[m[1]]+12*(+m[2]+1)-69)/12):0;}
 // ---------------- Musik aus Dateien (ADR-2026-11-13b) ----------------
 // Playlists je Bereich; die Liste erzeugt das Musik-Skript aus den Ordnern werft/meer/kran/tauchen/untergang.
-/*KW_MUSIC_START*/window.KW_MUSIC={"werft":["musik/werft/1-werft-jazz-1.mp3","musik/werft/2-werft-jazz-2.mp3"],"meer":["musik/meer/1-drunken-sailor.mp3","musik/meer/2-wellerman.mp3","musik/meer/3-my-bonnie.mp3","musik/meer/4-hamborger-veermaster.mp3","musik/meer/5-row-your-boat.mp3","musik/meer/6-michael-row.mp3","musik/meer/7-shenandoah.mp3","musik/meer/8-blow-the-man-down.mp3","musik/meer/9-sailors-hornpipe.mp3","musik/meer/10-haul-away-joe.mp3","musik/meer/11-alle-meine-entchen.mp3"],"kran":[],"tauchen":[],"untergang":[]};/*KW_MUSIC_END*/
+/*KW_MUSIC_START*/window.KW_MUSIC={"werft":["musik/werft/1-werft-1.mp3"],"meer":["musik/meer/1-rolling-deckside-1.mp3","musik/meer/2-rolling-deckside-2.mp3","musik/meer/3-rolling-deckside-3.mp3","musik/meer/4-rolling-deckside-4.mp3"],"kran":["musik/kran/1-rolling-deckside-x-rolling-deckside-mashup.mp3"],"tauchen":["musik/tauchen/1-diving.mp3"],"untergang":[]};/*KW_MUSIC_END*/
 const MUSIC_VOL=.32,MUSIC_FADE=1.5;
 const MUS={area:null,play:null,idx:{},players:[],duck:1,want:false};
 const MODE_AREA={werft:'werft',sea:'meer',sinking:'meer',harbor:'meer',kran:'kran',tauch:'tauchen'};

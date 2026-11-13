@@ -1,8 +1,8 @@
 // Kleine Werft – Service Worker (Offline-Betrieb)
 // Alle Dateien liegen im Cache. Eine neue Version wird im Hintergrund vollständig geladen
 // und erst aktiv, wenn die App das nächste Mal gestartet wird (kein skipWaiting) – ein laufendes Spiel wird nie unterbrochen.
-const CACHE = 'kleine-werft-66';
-const FILES = ["musik/meer/1-drunken-sailor.mp3", "musik/meer/10-haul-away-joe.mp3", "musik/meer/11-alle-meine-entchen.mp3", "musik/meer/2-wellerman.mp3", "musik/meer/3-my-bonnie.mp3", "musik/meer/4-hamborger-veermaster.mp3", "musik/meer/5-row-your-boat.mp3", "musik/meer/6-michael-row.mp3", "musik/meer/7-shenandoah.mp3", "musik/meer/8-blow-the-man-down.mp3", "musik/meer/9-sailors-hornpipe.mp3", "musik/werft/1-werft-jazz-1.mp3", "musik/werft/2-werft-jazz-2.mp3", "./", "index.html", "three.min.js", "manifest.webmanifest", "fonts/Fredoka.ttf", "fonts/AtkinsonHyperlegible-Regular.ttf", "fonts/AtkinsonHyperlegible-Bold.ttf", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png"];
+const CACHE = 'kleine-werft-67';
+const FILES = ["musik/kran/1-rolling-deckside-x-rolling-deckside-mashup.mp3", "musik/meer/1-rolling-deckside-1.mp3", "musik/meer/2-rolling-deckside-2.mp3", "musik/meer/3-rolling-deckside-3.mp3", "musik/meer/4-rolling-deckside-4.mp3", "musik/werft/1-werft-1.mp3", "musik/tauchen/1-diving.mp3", "./", "index.html", "three.min.js", "manifest.webmanifest", "fonts/Fredoka.ttf", "fonts/AtkinsonHyperlegible-Regular.ttf", "fonts/AtkinsonHyperlegible-Bold.ttf", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png"];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))));
