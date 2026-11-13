@@ -11,6 +11,6 @@ Spielstände bleiben nur auf dem Gerät. Im Elternbereich lassen sie sich als Da
 ## Inhalt
 - `index.html` – das Spiel (Three.js, alles im Code erzeugt)
 - `three.min.js` – [three.js](https://threejs.org) r128, MIT-Lizenz
-- `musik/` – Musik je Bereich (werft, meer, kran, tauchen, untergang); Startinhalt: zwei eigene Jazz-Stücke und gemeinfreie traditionelle Seemannslieder, vom Spiel selbst eingespielt. Quellen fremder Stücke: `musik/QUELLEN.txt`
+- `musik/` – Musik je Bereich (werft, meer, kran, tauchen, untergang); eigene Stücke des Autors. Quellen fremder Stücke stehen ggf. in `musik/QUELLEN.txt`
 - `fonts/` – Fredoka und Atkinson Hyperlegible, SIL Open Font License (siehe `fonts/OFL-*.txt`)
 - `sw.js`, `manifest.webmanifest`, `icons/` – Offline-App
