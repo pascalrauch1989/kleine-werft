@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"><meta name="theme-color" content="#2f8fd0"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
-<script>window.KW_APP=1;window.KW_BUILD={"v": "70", "t": "13.11.2026, 13:10 Uhr"};</script>
+<script>window.KW_APP=1;window.KW_BUILD={"v": "71", "t": "13.11.2026, 13:28 Uhr"};</script>
 <title>Kleine Werft</title>
 <style>@font-face{font-family:"Fredoka";src:url("fonts/Fredoka.ttf") format("truetype");font-weight:300 700;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype");font-weight:700;font-display:swap}</style>
 <style>
@@ -460,7 +460,7 @@ function hornOff(){if(!hornNodes)return;const {g,os}=hornNodes;g.gain.linearRamp
 const NOTE_IDX={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
 function nf(n){if(n==='R')return 0;const m=n.match(/^([A-G](?:#|b)?)(\d)$/);return m?440*Math.pow(2,(NOTE_IDX[m[1]]+12*(+m[2]+1)-69)/12):0;}
 // ---------------- Version & Update-Stand (Startbildschirm unten links, Elternbereich) ----------------
-/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "70", "t": "13.11.2026, 13:10 Uhr", "test": 1};/*KW_BUILD_END*/
+/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "71", "t": "13.11.2026, 13:28 Uhr", "test": 1};/*KW_BUILD_END*/
 const UPD={state:null,v:null,pct:0};
 function verText(){const B=window.KW_BUILD||{};let s=(B.test?'Test · ':'')+'Version '+B.v+(B.t?' · '+B.t:'');
   if(UPD.state==='first')s+=' · Offline-Speicher ⬇ '+UPD.pct+' %';else if(UPD.state==='firstdone')s+=' · offline bereit ✓';
@@ -697,6 +697,7 @@ const PLANK_G=`<g ${ISO_S}><path d="M28 52L68 29V36L28 59Z" fill="#b47a3f"/><pat
 const BEAM_SVG=`<svg viewBox="0 0 74 74">${BEAM_G}</svg>`,PLANK_SVG=`<svg viewBox="0 0 74 74">${PLANK_G}</svg>`;
 const MATERIAL_TAB_SVG=`<svg viewBox="0 0 148 74"><g transform="translate(2 2) scale(.95)">${BEAM_G}</g><g transform="translate(74 2) scale(.95)">${PLANK_G}</g></svg>`;
 const MATERIALS={stahl:{icon:BEAM_SVG,hull:'#e8473c',deck:'#c99a63'},holz:{icon:PLANK_SVG,hull:'#9b6234',deck:'#d9b27c'}};
+TAB_ICON.frei=ISO(`<g transform="translate(-4 16) scale(.8)">${IN.pool}</g><g transform="translate(30 -4) scale(.62)">${IN.rutsche}</g>`);
 const TOPS={
   container:{h:2.6,stack:true,icon:AUF_SVG.container,span:2},container10:{h:2.6,stack:true,icon:AUF_SVG.container10},cfill:{h:2.6,stack:true,hidden:true},kabine:{h:2.4,stack:true,icon:AUF_SVG.kabine,c:'#ffffff'},bruecke:{h:2.8,stack:true,icon:AUF_SVG.bruecke,c:'#ffffff'},
   boot:{h:1.7,stack:false,icon:AUF_SVG.boot,c:'#ff8a1f'},kran:{h:6,stack:false,icon:AUF_SVG.kran},radar:{h:4,stack:false,icon:AUF_SVG.radar},mast:{h:15,stack:false,icon:AUF_SVG.mast,c:'#c9a36b'},treppe:{h:.02,stack:false,stair:1,icon:AUF_SVG.treppe,c:'#8f9aa5'},treppe2:{h:.02,stack:false,stair:2,icon:AUF_SVG.treppe2,c:'#8f9aa5'},
@@ -705,8 +706,8 @@ const TOPS={
   dampf:{h:5.5,stack:false,tab:'schorn',icon:FUN_SVG.dampf,c:'#3a3f47'},
   modern:{h:3.4,stack:false,tab:'schorn',icon:FUN_SVG.modern,c:'#ffffff'},
   doppel:{h:4.5,stack:false,tab:'schorn',icon:FUN_SVG.doppel,c:'#e8473c'},
-  balkon:{h:2.4,stack:true,icon:AUF_SVG.balkon,c:'#ffffff'},kuppel:{h:2.2,stack:false,icon:AUF_SVG.kuppel,c:'#a9d8f2'},pool:{h:.6,stack:false,icon:AUF_SVG.pool,c:'#4fc3f7'},
-  rutsche:{h:7,stack:false,icon:AUF_SVG.rutsche,c:'#ff7eb6'},auto:{h:1.5,stack:false,icon:AUF_SVG.auto,c:'#e8473c'}
+  balkon:{h:2.4,tab:'frei',stack:true,icon:AUF_SVG.balkon,c:'#ffffff'},kuppel:{h:2.2,tab:'frei',stack:false,icon:AUF_SVG.kuppel,c:'#a9d8f2'},pool:{h:.6,tab:'frei',stack:false,icon:AUF_SVG.pool,c:'#4fc3f7'},
+  rutsche:{h:7,tab:'frei',stack:false,icon:AUF_SVG.rutsche,c:'#ff7eb6'},auto:{h:1.5,tab:'frei',stack:false,icon:AUF_SVG.auto,c:'#e8473c'}
 };
 const MAST_H={dreieck:17,rah:18,spinnaker:14};
 Object.keys(HORNS).forEach(k=>{if(HORN_SVG[k])HORNS[k].icon=HORN_SVG[k];});
@@ -2722,7 +2723,7 @@ $('#shipsBtn').innerHTML=BOOK_SVG;$('#shipsBtn').onclick=openBook;
 // ---------------- Werft: Bedienung ----------------
 // Schiff im Flat Design: Heck (orange), Mittelteil (grün), Bug (blau), leicht getrennt
 const HULL_TAB_SVG=`<svg viewBox="0 0 148 74"><g stroke="#22314a" stroke-width="2.5" stroke-linejoin="round"><path d="M8 22H40V52H20Q9 46 8 22Z" fill="#ff9f1c"/><rect x="45" y="22" width="52" height="30" fill="#3fbf6a"/><path d="M102 22H142L124 52H102Z" fill="#2f8fd0"/></g><path d="M12 30H38M47 30H95M104 30H137" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity=".85"/><path d="M4 62q9-5 18 0t18 0t18 0t18 0t18 0t18 0t18 0t18 0" fill="none" stroke="#7fc4ff" stroke-width="3" stroke-linecap="round"/></svg>`;
-const TABS=[{id:'material',icon:MATERIAL_TAB_SVG},{id:'rumpf',icon:HULL_TAB_SVG},{id:'auf',icon:TAB_ICON.auf},{id:'schorn',icon:TAB_ICON.schorn},{id:'antrieb',icon:TAB_ICON.antrieb},{id:'farbe',icon:'🎨'},{id:'deko',icon:TAB_ICON.deko},{id:'horn',icon:TAB_ICON.horn}];
+const TABS=[{id:'material',icon:MATERIAL_TAB_SVG},{id:'rumpf',icon:HULL_TAB_SVG},{id:'auf',icon:TAB_ICON.auf},{id:'frei',icon:TAB_ICON.frei},{id:'schorn',icon:TAB_ICON.schorn},{id:'antrieb',icon:TAB_ICON.antrieb},{id:'farbe',icon:'🎨'},{id:'deko',icon:TAB_ICON.deko},{id:'horn',icon:TAB_ICON.horn}];
 let curTab='material',undoStack=[];
 function svgPts(pts,{fill='#e8473c',ox=0}={}){const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);const minx=Math.min(...xs,ox),maxx=Math.max(...xs,ox),miny=Math.min(...ys),maxy=Math.max(...ys);const s=Math.min(60/(maxx-minx||1),40/(maxy-miny||1));
   const d=pts.map(([x,y],i)=>(i?'L':'M')+((x-minx)*s+7).toFixed(1)+' '+((y-miny)*s+(50-(maxy-miny)*s)/2).toFixed(1)).join(' ')+'Z';return `<svg viewBox="0 0 74 50"><path d="${d}" fill="${fill}" stroke="#22314a" stroke-width="2.5" stroke-linejoin="round"/></svg>`;}
@@ -2734,6 +2735,7 @@ function trayItems(){const W=7.5;
     ...[0,1,2].map(i=>({type:'width',v:i,html:`<svg viewBox="0 0 74 50"><rect x="8" y="${25-[6,10,15][i]}" width="58" height="${[12,20,30][i]}" rx="4" fill="#9aa8b4" stroke="#22314a" stroke-width="2.5"/></svg>`,on:design.width===i}))];
   if(curTab==='material')return Object.keys(MATERIALS).map(k=>({type:'material',v:k,html:MATERIALS[k].icon,on:design.material===k}));
   if(curTab==='auf')return Object.keys(TOPS).filter(k=>!TOPS[k].tab&&!TOPS[k].hidden).map(k=>({type:'top',v:k,html:TOPS[k].icon}));
+  if(curTab==='frei')return Object.keys(TOPS).filter(k=>TOPS[k].tab==='frei').map(k=>({type:'top',v:k,html:TOPS[k].icon}));
   if(curTab==='schorn')return Object.keys(TOPS).filter(k=>TOPS[k].tab==='schorn').map(k=>({type:'top',v:k,html:TOPS[k].icon}));
   if(curTab==='antrieb')return [{type:'screw',v:'schraube',html:SCREW_SVG,live:design.screw},
     ...Object.keys(SAIL_SVG).map(k=>({type:'sail',v:k,html:SAIL_SVG[k],live:design.sails.some(s=>s.t===k)})),
@@ -2927,7 +2929,9 @@ function loadProfile(id){currentProfile=id;LS.set('kw.profile.cur',id);SAVE_KEY=
   if(world){world.harbors.forEach((h,i)=>{const v=visited.has(i);h.flag.material.color.set(v?'#3fbf6a':'#ffd23f');h.check.visible=v;});if(save.lastHarbor>=world.harbors.length)save.lastHarbor=0;}
   if(master)master.gain.value=save.vol;syncHarborStickers();refreshFindMarks();applyHazardPct();applyControlUI();refreshFog();updateCount();}
 let startPlay=()=>{};
-let FS_WANT=false;const fsAgain=()=>{if(!FS_WANT||document.fullscreenElement||!document.documentElement.requestFullscreen)return;try{const r=document.documentElement.requestFullscreen({navigationUI:'hide'});if(r&&r.catch)r.catch(()=>{});}catch(e){}};
+let FS_WANT=false,FS_LOST=true;const IS_APP=(()=>{try{return !!window.KW_APP&&['fullscreen','standalone','minimal-ui'].some(m=>matchMedia('(display-mode: '+m+')').matches);}catch(e){return false;}})();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&!document.fullscreenElement)FS_LOST=true;});document.addEventListener('fullscreenchange',()=>{if(document.fullscreenElement)FS_LOST=false;});
+const fsAgain=()=>{if(IS_APP||!FS_WANT||!FS_LOST||document.fullscreenElement||!document.documentElement.requestFullscreen)return;FS_LOST=false;try{const r=document.documentElement.requestFullscreen({navigationUI:'hide'});if(r&&r.catch)r.catch(()=>{});}catch(e){}};
 ['pointerdown','touchend','click'].forEach(ev=>window.addEventListener(ev,fsAgain,true));
 // ---------- Startbildschirm mit Profilkarten ----------
 function renderStart(){const box=$('#profiles');if(!box)return;box.innerHTML='';
