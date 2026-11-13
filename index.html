@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"><meta name="theme-color" content="#2f8fd0"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
-<script>window.KW_APP=1;window.KW_VERSION="65";</script>
+<script>window.KW_APP=1;window.KW_VERSION="66";</script>
 <title>Kleine Werft</title>
 <style>@font-face{font-family:"Fredoka";src:url("fonts/Fredoka.ttf") format("truetype");font-weight:300 700;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype");font-weight:700;font-display:swap}</style>
 <style>
@@ -408,8 +408,8 @@ const stickers=new Set(save.stickers), visited=new Set(save.visited);
 function persist(){save.design=design;if(Array.isArray(save.ships)&&save.ships.length)save.ships[clamp(save.cur|0,0,save.ships.length-1)]=design;save.stickers=[...stickers];save.visited=[...visited];save.explored=exploredToStr();LS.set(SAVE_KEY,save);}
 
 // ---------------- Audio ----------------
-let AC=null,master=null,musicGain=null,musicTimer=null;
-function audioInit(){if(AC)return;try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=save.vol;master.connect(AC.destination);musicGain=AC.createGain();musicGain.gain.value=.16;musicGain.connect(master);}catch(e){AC=null;}}
+let AC=null,master=null;
+function audioInit(){if(AC)return;try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=save.vol;master.connect(AC.destination);}catch(e){AC=null;}}
 function tone({f=440,f2=null,t=.15,type='sine',v=.4,at=0,dest=null,attack=.005}){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain(),s=AC.currentTime+at;o.type=type;o.frequency.setValueAtTime(f,s);if(f2)o.frequency.exponentialRampToValueAtTime(f2,s+t);g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(v,s+attack);g.gain.exponentialRampToValueAtTime(.001,s+t);o.connect(g);g.connect(dest||master);o.start(s);o.stop(s+t+.05);}
 function noise(t=.05,v=.3,freq=2000,at=0,dest=null){if(!AC)return;const b=AC.createBuffer(1,AC.sampleRate*t,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();f.type='bandpass';f.frequency.value=freq;g.gain.value=v;s.buffer=b;s.connect(f);f.connect(g);g.connect(dest||master);s.start(AC.currentTime+at);}
 const SFX={
@@ -445,96 +445,32 @@ function hornOff(){if(!hornNodes)return;const {g,os}=hornNodes;g.gain.linearRamp
 // ---------- Musik: Werft-Lied + Seefahrer-Playlist (traditionelle, gemeinfreie Melodien, nur Töne) ----------
 const NOTE_IDX={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
 function nf(n){if(n==='R')return 0;const m=n.match(/^([A-G](?:#|b)?)(\d)$/);return m?440*Math.pow(2,(NOTE_IDX[m[1]]+12*(+m[2]+1)-69)/12):0;}
-const SONG_SRC=[
- {id:'werft',bpm:200,bar:4,mel:'C4:1 E4:1 G4:1 C5:1 G4:1 E4:1 C4:1 R:1 E4:1 G4:1 C5:1 E5:1 C5:1 G4:1 E4:1 R:1 G4:1 C5:1 E5:1 A5:1 E5:1 C5:1 G4:1 R:1 E4:1 C4:1 E4:1 G4:1 E4:1 C4:1 R:1 R:1',bass:'C3 C3 A2 A2 F3 F3 G3 G3'},
- {id:'drunken-sailor',bpm:220,bar:2,rep:2,
-  mel:'A4:1 A4:.5 A4:.5 A4:1 A4:.5 A4:.5 A4:1 D4:1 F4:1 A4:1 G4:1 G4:.5 G4:.5 G4:1 G4:.5 G4:.5 G4:1 C4:1 E4:1 G4:1 A4:1 A4:.5 A4:.5 A4:1 A4:.5 A4:.5 A4:1 D4:1 F4:1 A4:1 C5:1 A4:1 G4:1 E4:1 D4:2 D4:2 A4:2 A4:1 A4:.5 A4:.5 A4:1 D4:1 F4:1 A4:1 G4:2 G4:1 G4:.5 G4:.5 G4:1 C4:1 E4:1 G4:1 A4:2 A4:1 A4:.5 A4:.5 A4:1 D4:1 F4:1 A4:1 C5:1 A4:1 G4:1 E4:1 D4:2 D4:2',
-  bass:'D3 D3 D3 D3 C3 C3 C3 C3 D3 D3 D3 D3 C3 A2 D3 D3'},
- {id:'wellerman',bpm:170,bar:4,rep:2,
-  mel:'R:3 A3:1 D4:1 D4:.5 D4:.5 F4:1 A4:.5 A4:.5 A4:3 A4:1 Bb4:1 G4:.5 G4:.5 Bb4:1 D5:.5 D5:.5 D5:1 C5:.5 Bb4:.5 A4:1 A4:1 D5:1 D5:.5 D5:.5 C5:1 Bb4:.5 A4:.5 A4:3 A4:1 D5:1 C5:.5 Bb4:.5 A4:.5 G4:.5 F4:.5 E4:.5 D4:3 A4:1 D5:1.5 D5:.5 C5:1 Bb4:1 A4:1 G4:1 A4:2 A4:.5 G4:.5 F4:.5 G4:.5 A4:.5 Bb4:.5 A4:1 G4:1 E4:1 C4:1 E4:1 D5:1 D5:.5 D5:.5 C5:1 Bb4:.5 A4:.5 G4:1 E4:1 C#4:1 E4:1 D4:3 R:1',
-  bass:'D3 D3 D3 G2 Bb2 D3 A2 D3 D3 D3 F3 C3 D3 G2 A2 D3'},
- {id:'my-bonnie',bpm:160,bar:3,
-  mel:'R:2 G4:1 E5:1.5 D5:.5 C5:1 D5:1 C5:1 A4:1 G4:1 E4:2 R:2 G4:1 E5:1.5 D5:.5 C5:1 C5:1 B4:1 C5:1 D5:3 R:2 G4:1 E5:1.5 D5:.5 C5:1 D5:1 C5:1 A4:1 G4:1 E4:2 R:2 G4:1 A4:1 D5:1 C5:1 B4:1 A4:1 B4:1 C5:3',
-  bass:'C3 C3 F3 C3 C3 C3 D3 G2 G2 C3 F3 C3 A2 D3 G2 C3'},
- {id:'hamborger-veermaster',bpm:210,bar:4,rep:2,
-  mel:'G4:.5 G4:.5 E4:.5 G4:.5 A4:.5 G4:.5 E4:1 E4:.5 D4:1.5 E4:.5 D4:1.5 G4:.5 G4:.5 E4:.5 G4:.5 A4:.5 G4:.5 E4:1 D4:1 E4:1 D4:1 C4:1 C4:1.5 C4:.5 E4:1 G4:1 C5:4 A4:1.5 A4:.5 C5:1 A4:1 G4:4 G4:.5 G4:.5 E4:.5 E4:.5 G4:.5 G4:.5 E4:1 D4:1 E4:1 D4:1 C4:1',
-  bass:'C3 G2 C3 G2 C3 C3 F3 C3 C3 C3'},
- {id:'row-your-boat',bpm:330,bar:6,rep:2,
-  mel:'C4:3 C4:3 C4:2 D4:1 E4:3 E4:2 D4:1 E4:2 F4:1 G4:6 C5:1 C5:1 C5:1 G4:1 G4:1 G4:1 E4:1 E4:1 E4:1 C4:1 C4:1 C4:1 G4:2 F4:1 E4:2 D4:1 C4:6',
-  bass:'C3 C3 C3 C3 C3 C3 G2 C3'},
- {id:'michael-row',bpm:150,bar:4,rep:2,
-  mel:'C4:1 E4:1 G4:1.5 E4:.5 G4:1 A4:1 G4:2 E4:1 G4:1 A4:2 G4:4 E4:1 G4:1 G4:1.5 E4:.5 F4:1 E4:1 D4:2 C4:1 D4:1 E4:1.5 D4:.5 C4:4',
-  bass:'C3 F3 A2 C3 C3 G2 G2 C3'},
- {id:'shenandoah',bpm:100,bar:4,
-  mel:'D4:1 G4:1 G4:1 G4:1.5 A4:.5 B4:1 D5:1 C5:2 E5:1 D5:2 B4:1 D5:2 D5:1 B4:1 A4:1 G4:1 A4:3 R:1 G4:1 A4:1 B4:2 G4:1 B4:1 D5:1 E5:2 D5:1 B4:1 G4:1 A4:2 G4:1 E4:1 D4:1 G4:3 R:1',
-  bass:'G2 G2 C3 G2 G2 D3 G2 C3 G2 D3 G2'},
- {id:'blow-the-man-down',bpm:170,bar:3,rep:2,
-  mel:'R:2 D4:1 G4:2 A4:1 B4:2 G4:1 D5:3 B4:2 G4:1 A4:2 B4:1 A4:2 F#4:1 D4:3 R:2 D4:1 G4:2 A4:1 B4:2 D5:1 E5:2 D5:1 B4:2 G4:1 A4:2 F#4:1 G4:3',
-  bass:'G2 G2 G2 G2 G2 D3 D3 D3 G2 G2 G2 C3 G2 D3 G2'},
- {id:'sailors-hornpipe',bpm:200,bar:4,rep:2,
-  mel:'F#4:.5 A4:.5 D5:.5 A4:.5 F#4:.5 A4:.5 D5:.5 F#5:.5 E5:.5 G5:.5 E5:.5 C#5:.5 A4:.5 C#5:.5 E5:.5 G5:.5 F#5:.5 A5:.5 F#5:.5 D5:.5 G5:.5 F#5:.5 E5:.5 D5:.5 C#5:.5 E5:.5 A4:.5 C#5:.5 D5:1 R:1 D5:.5 C#5:.5 B4:.5 A4:.5 G4:.5 F#4:.5 E4:.5 D4:.5 E4:.5 G4:.5 B4:.5 G4:.5 A4:.5 C#5:.5 E5:.5 C#5:.5 D5:.5 F#5:.5 A5:.5 F#5:.5 G5:.5 E5:.5 C#5:.5 A4:.5 D5:2 R:2',
-  bass:'D3 A2 D3 A2 D3 G2 A2 D3'},
- {id:'haul-away-joe',bpm:180,bar:4,rep:2,
-  mel:'D4:1 F4:1 A4:1 A4:1 G4:1 E4:1 C4:2 D4:1 F4:1 A4:1 C5:1 A4:2 R:2 A4:1 C5:1 D5:2 C5:1 A4:1 G4:2 F4:1 E4:1 D4:2 R:2',
-  bass:'D3 C3 D3 A2 D3 C3 D3 D3'},
- {id:'alle-meine-entchen',bpm:170,bar:2,
-  mel:'C4:.5 D4:.5 E4:.5 F4:.5 G4:1 G4:1 A4:.5 A4:.5 A4:.5 A4:.5 G4:2 A4:.5 A4:.5 A4:.5 A4:.5 G4:2 F4:.5 F4:.5 F4:.5 F4:.5 E4:1 E4:1 D4:.5 D4:.5 D4:.5 D4:.5 C4:2 C5:.5 D5:.5 E5:.5 F5:.5 G5:.5 E5:.5 G5:1 A5:.25 G5:.25 A5:.25 B5:.25 A5:.5 F5:.5 G5:2 A5:.5 C6:.5 A5:.5 F5:.5 G5:1.5 E5:.5 F5:.5 A5:.5 F5:.5 D5:.5 E5:.5 G5:.5 E5:.5 C5:.5 D5:.5 F5:.5 B4:.5 D5:.5 C5:2 F4:.5 A4:.5 C5:1 G4:.5 B4:.5 D5:1 E4:.5 G4:.5 C5:.5 E5:.5 D5:1.5 R:.5 F4:.5 A4:.5 C5:.5 A4:.5 G4:.5 B4:.5 D5:.5 B4:.5 C5:.5 G4:.5 E4:.5 G4:.5 F4:.5 E4:.5 D4:.5 G4:.5 C4:.5 D4:.5 E4:.5 F4:.5 G4:1 G4:1 A4:.5 A4:.5 A4:.5 A4:.5 G4:2 A4:.5 A4:.5 A4:.5 A4:.5 G4:2 F4:.5 F4:.5 F4:.5 F4:.5 E4:1 E4:1 D4:.5 D4:.5 D4:.5 D4:.5 C4:2 G4:.5 A4:.5 G4:.5 E4:.5 D4:.5 E4:.5 C4:1 E4:.5 G4:.5 C5:1 C5:2',
-  bass:'C3 C3 F3 C3 F3 C3 F3 C3 G2 C3 C3 C3 F3 C3 F3 C3 F3 C3 G2 C3 F2 G2 C3 G2 F2 G2 C3 G2 C3 C3 F3 C3 F3 C3 F3 C3 G2 C3 C3 G2 C3 C3'}
-];
-// Werft: zwei eigene Jazz-Lounge-Stücke (entspannt, Vibraphon, Walking-Bass, Besen) – eigene Kompositionen
-const JAZZ_SRC=[
- {id:'werft-jazz-1',bpm:92,swing:true,
-  chords:['Gm7','C7','Fmaj7','Dm7','Gm7','C7','Fmaj7','Fmaj7','Bbmaj7','Eb7','Am7','D7','Gm7','C7','F6','C7'],
-  mel:'D5:1.5 C5:.5 Bb4:1 A4:1 G4:1 Bb4:.5 C5:.5 E5:2 F5:1.5 E5:.5 C5:1 A4:1 D5:3 R:1 Bb4:.5 D5:.5 F5:1 E5:.5 D5:.5 C5:1 Bb4:1 G4:1 E4:1 G4:1 A4:2 C5:1 E5:1 F5:3 R:1 D5:1.5 F5:.5 A5:1 F5:1 G5:1 F5:.5 Eb5:.5 Db5:1 Bb4:1 C5:1.5 E5:.5 G5:1 E5:1 F#5:1 E5:.5 D5:.5 C5:1 A4:1 Bb4:1 D5:1 F5:1 A5:1 G5:1.5 E5:.5 C5:1 Bb4:1 A4:1 C5:1 D5:1 F5:1 E5:2 R:2'},
- {id:'werft-jazz-2',bpm:96,swing:false,
-  chords:['Cmaj7','Am7','Dm7','G7','Em7','A7','Dm7','G7','Fmaj7','Fm6','Em7','A7','Dm7','G7','Cmaj7','G7'],
-  mel:'E5:1 G5:1 B5:1.5 A5:.5 G5:2 E5:1 C5:1 F5:1 A5:1 C6:1.5 B5:.5 A5:2 F5:1 D5:1 G5:1 E5:.5 D5:.5 B4:2 C#5:1 E5:1 G5:1 A5:1 F5:1.5 E5:.5 D5:1 C5:1 B4:2 D5:1 F5:1 A5:1.5 G5:.5 F5:1 E5:1 Ab5:1.5 G5:.5 F5:1 D5:1 E5:1 G5:1 B5:1 G5:1 A5:1 G5:.5 E5:.5 C#5:2 D5:1 F5:1 A5:1 C6:1 B5:1.5 A5:.5 G5:1 F5:1 E5:2 G5:1 B5:1 D5:2 R:2'}
-];
-const CHORD_Q={maj7:[0,4,7,11],m7:[0,3,7,10],'7':[0,4,7,10],'6':[0,4,7,9],m6:[0,3,7,9]};
-const mf=m=>440*Math.pow(2,(m-69)/12);
-function chordOf(sym){const m=sym.match(/^([A-G](?:#|b)?)(.*)$/);return {r:NOTE_IDX[m[1]],iv:CHORD_Q[m[2]]||[0,4,7,10]};}
-const swingT=p=>{const w=Math.floor(p+1e-9),f=p-w;return w+(f<=.5?f*4/3:2/3+(f-.5)*2/3);};
-function jazzSong(J){const ev=[],sw=J.swing?swingT:(p=>p);
-  J.chords.forEach((sym,i)=>{const B=i*4,{r,iv}=chordOf(sym),nx=chordOf(J.chords[(i+1)%J.chords.length]);
-    let root=36+r;if(root<40)root+=12;let nroot=36+nx.r;if(nroot<40)nroot+=12;
-    if(J.swing)[root,root+iv[1],root+iv[2],nroot+(i%2?1:-1)].forEach((m,k)=>ev.push({b:sw(B+k),d:.95,f:mf(m),i:'wbass'}));
-    else[[0,1.5,root],[1.5,.5,root+7],[2,1.5,root],[3.5,.5,root+7]].forEach(([o,d,m])=>ev.push({b:B+o,d,f:mf(m),i:'wbass'}));
-    const voic=[iv[1],iv[3],14].map(x=>{let m=60+r+x;while(m>72)m-=12;while(m<55)m+=12;return m;});
-    (J.swing?[[0,.6],[1.5,.45],[3,.3]]:[[0,.5],[1.5,.5],[2.5,.4],[3.5,.4]]).forEach(([o,d])=>voic.forEach(m=>ev.push({b:sw(B+o),d,f:mf(m),i:'comp'})));
-    if(J.swing){[1,3].forEach(o=>ev.push({b:B+o,d:.3,i:'brush',v:.08}));[0,1,2,3].forEach(o=>ev.push({b:sw(B+o+.5),d:.1,i:'brush',v:.03}));}
-    else for(let k=0;k<8;k++)ev.push({b:B+k*.5,d:.1,i:'brush',v:k%2?.025:.045});});
-  let b=0;J.mel.trim().split(/\s+/).forEach(t=>{const [n,d]=t.split(':'),dd=+d,f=nf(n);if(f)ev.push({b:sw(b),d:sw(b+dd)-sw(b),f,i:'vib'});b+=dd;});
-  ev.sort((a,c)=>a.b-c.b);return {id:J.id,bpm:J.bpm,bar:4,ev,len:J.chords.length*4,werft:true};}
-function shantySong(S){let notes=S.mel.trim().split(/\s+/).map(t=>{const [n,d]=t.split(':');return [n,+d];});const one=notes;for(let r=1;r<(S.rep||1);r++)notes=notes.concat(one);
-  const ev=[];let b=0;notes.forEach(([n,d])=>{const f=nf(n);if(f)ev.push({b,d,f,i:'lead'});b+=d;});
-  const bars=Math.ceil(b/S.bar-1e-6),src=S.bass.split(/\s+/);for(let i=0;i<bars;i++){const f=nf(src[i%src.length]);if(f)ev.push({b:i*S.bar,d:S.bar,f,i:'bass'});}
-  ev.sort((a,c)=>a.b-c.b);return {id:S.id,bpm:S.bpm,bar:S.bar,ev,len:bars*S.bar,werft:false};}
-const SONGS=[...JAZZ_SRC.map(jazzSong),...SONG_SRC.filter(s=>s.id!=='werft').map(shantySong)];
-const WERFT_SONGS=SONGS.map((s,i)=>i).filter(i=>SONGS[i].werft),SEA_SONGS=SONGS.map((s,i)=>i).filter(i=>!SONGS[i].werft);
-function vib(f,at,dur){const s=AC.currentTime+at,g=AC.createGain();g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(.42,s+.006);g.gain.exponentialRampToValueAtTime(.001,s+Math.max(.7,dur)+.7);
-  const o1=AC.createOscillator(),o2=AC.createOscillator(),g2=AC.createGain(),trem=AC.createOscillator(),tg=AC.createGain();o1.type='sine';o1.frequency.value=f;o2.type='sine';o2.frequency.value=f*4;
-  g2.gain.setValueAtTime(.22,s);g2.gain.exponentialRampToValueAtTime(.001,s+.22);trem.frequency.value=5.2;tg.gain.value=.1;trem.connect(tg);tg.connect(g.gain);
-  o1.connect(g);o2.connect(g2);g2.connect(g);g.connect(musicGain);[o1,o2,trem].forEach(o=>{o.start(s);o.stop(s+Math.max(.7,dur)+.8);});}
-function playEv(e,at,spb){const dur=e.d*spb;
-  if(e.i==='lead')tone({f:e.f,t:Math.max(.12,dur*.92),type:'triangle',v:.5,at,dest:musicGain,attack:.02});
-  else if(e.i==='bass')tone({f:e.f,t:dur*.9,type:'sine',v:.6,at,dest:musicGain,attack:.03});
-  else if(e.i==='vib')vib(e.f,at,dur);
-  else if(e.i==='wbass'){tone({f:e.f,t:Math.min(.85,dur*1.05),type:'triangle',v:.4,at,dest:musicGain,attack:.008});tone({f:e.f,t:Math.min(.85,dur),type:'sine',v:.5,at,dest:musicGain,attack:.008});}
-  else if(e.i==='comp')tone({f:e.f,t:Math.max(.15,dur),type:'sine',v:.12,at,dest:musicGain,attack:.012});
-  else if(e.i==='brush')noise(.07+e.d*.08,e.v||.06,5200,at,musicGain);}
-const mus={timer:null,cur:null,ei:0,t0:0,songT0:0,nextT:0,mode:null,bag:[],wi:0};
-function pickSeaSong(){if(!mus.bag.length){mus.bag=SEA_SONGS.slice().sort(()=>Math.random()-.5);if(mus.bag[0]===mus.cur&&mus.bag.length>1)mus.bag.push(mus.bag.shift());}return mus.bag.shift();}
-function pickWerftSong(){mus.wi=(mus.wi+1)%WERFT_SONGS.length;return WERFT_SONGS[mus.wi];}
-function startSong(i,again){mus.cur=i;mus.ei=0;const now=AC?AC.currentTime+.08:0;mus.t0=Math.max(mus.nextT,now);if(!again)mus.songT0=mus.t0;}
-function newMusicBus(){if(!AC)return;const old=musicGain;musicGain=AC.createGain();musicGain.gain.value=.16;musicGain.connect(master);if(old){old.gain.setTargetAtTime(0,AC.currentTime,.06);setTimeout(()=>{try{old.disconnect();}catch(e){}},900);}}
-function musicMode(m){if(mus.mode===m)return;mus.mode=m;if(AC){newMusicBus();mus.nextT=AC.currentTime+.2;}startSong(m==='werft'?WERFT_SONGS[mus.wi]:pickSeaSong());}
-function musicTick(){if(!AC||mus.cur===null)return;const S=SONGS[mus.cur],spb=60/S.bpm,now=AC.currentTime,hz=now+1.2;
-  if(mus.t0+S.len*spb<now-1){mus.nextT=now+.1;startSong(mus.cur,true);return;}
-  while(mus.ei<S.ev.length){const e=S.ev[mus.ei],t=mus.t0+e.b*spb;if(t>hz)break;if(t>=now-.02)playEv(e,Math.max(0,t-now),spb);mus.ei++;}
-  if(mus.ei>=S.ev.length){const end=mus.t0+S.len*spb;if(end<hz){if(end-mus.songT0<90){mus.nextT=end;startSong(mus.cur,true);}
-    else{mus.nextT=end+spb*(mus.mode==='sea'?S.bar:2);startSong(mus.mode==='werft'?pickWerftSong():pickSeaSong());}}}}
-function musicStart(){if(!AC||mus.timer||!save.music)return;mus.nextT=AC.currentTime+.1;if(mus.cur!==null)startSong(mus.cur);mus.timer=setInterval(musicTick,100);musicTick();}
-function musicStop(){clearInterval(mus.timer);mus.timer=null;newMusicBus();}
+// ---------------- Musik aus Dateien (ADR-2026-11-13b) ----------------
+// Playlists je Bereich; die Liste erzeugt das Musik-Skript aus den Ordnern werft/meer/kran/tauchen/untergang.
+/*KW_MUSIC_START*/window.KW_MUSIC={"werft":["musik/werft/1-werft-jazz-1.mp3","musik/werft/2-werft-jazz-2.mp3"],"meer":["musik/meer/1-drunken-sailor.mp3","musik/meer/2-wellerman.mp3","musik/meer/3-my-bonnie.mp3","musik/meer/4-hamborger-veermaster.mp3","musik/meer/5-row-your-boat.mp3","musik/meer/6-michael-row.mp3","musik/meer/7-shenandoah.mp3","musik/meer/8-blow-the-man-down.mp3","musik/meer/9-sailors-hornpipe.mp3","musik/meer/10-haul-away-joe.mp3","musik/meer/11-alle-meine-entchen.mp3"],"kran":[],"tauchen":[],"untergang":[]};/*KW_MUSIC_END*/
+const MUSIC_VOL=.32,MUSIC_FADE=1.5;
+const MUS={area:null,play:null,idx:{},players:[],duck:1,want:false};
+const MODE_AREA={werft:'werft',sea:'meer',sinking:'meer',harbor:'meer',kran:'kran',tauch:'tauchen'};
+function musicResolve(area){const L=window.KW_MUSIC||{};if(area&&L[area]&&L[area].length)return area;if((area==='kran'||area==='tauchen')&&L.meer&&L.meer.length)return 'meer';return null;}
+function musicPlayer(){if(!AC||!master)return null;const el=new Audio();el.preload='auto';const g=AC.createGain();g.gain.value=0;try{AC.createMediaElementSource(el).connect(g);}catch(e){return null;}g.connect(master);
+  const P={el,g,area:null};el.addEventListener('ended',()=>{if(MUS.play===P)musicNext(P,false);});MUS.players.push(P);return P;}
+function musicFree(){return MUS.players.find(P=>P!==MUS.play&&P.el.paused)||(MUS.players.length<3?musicPlayer():MUS.players.find(P=>P!==MUS.play));}
+function musicNext(P,fresh){const L=window.KW_MUSIC[P.area]||[];if(!L.length)return;const k=fresh&&MUS.idx[P.area]!==undefined?MUS.idx[P.area]:((MUS.idx[P.area]??-1)+1)%L.length;MUS.idx[P.area]=k;
+  P.el.src=L[k];P.el.currentTime=0;const pr=P.el.play();if(pr&&pr.catch)pr.catch(()=>{});}
+function musicFadeTo(P,v,t=MUSIC_FADE){if(!P||!AC)return;const n=AC.currentTime;P.g.gain.cancelScheduledValues(n);P.g.gain.setValueAtTime(P.g.gain.value,n);P.g.gain.linearRampToValueAtTime(v,n+t);}
+function musicApply(){if(!AC||!MUS.want||!save.music)return;const area=musicResolve(MUS.area);
+  if(MUS.play&&MUS.play.area===area&&!MUS.play.el.paused){musicFadeTo(MUS.play,MUSIC_VOL*MUS.duck,.6);return;}
+  const old=MUS.play;if(old){musicFadeTo(old,0);setTimeout(()=>{if(MUS.play!==old)old.el.pause();},MUSIC_FADE*1000+80);}
+  MUS.play=null;if(!area)return;const P=musicFree();if(!P)return;P.area=area;P.g.gain.value=0;MUS.play=P;musicNext(P,true);musicFadeTo(P,MUSIC_VOL*MUS.duck);}
+function musicMode(m){const a=MODE_AREA[m]||m;if(MUS.area===a)return;MUS.area=a;musicApply();}
+function musicStart(){if(!AC||!save.music)return;MUS.want=true;if(AC.state==='suspended')AC.resume();musicApply();}
+function musicStop(){MUS.want=false;MUS.players.forEach(P=>{musicFadeTo(P,0,.4);setTimeout(()=>P.el.pause(),450);});MUS.play=null;}
+// Untergang: Musik leiser, kurzes Motiv (Datei aus untergang/ oder eingebaut)
+function musicSink(){if(!AC)return;MUS.duck=.25;if(MUS.play)musicFadeTo(MUS.play,MUSIC_VOL*MUS.duck,.8);
+  const U=(window.KW_MUSIC||{}).untergang||[];
+  if(U.length){const el=new Audio(U[0]);try{const g=AC.createGain();g.gain.value=MUSIC_VOL*1.6;AC.createMediaElementSource(el).connect(g);g.connect(master);}catch(e){}const pr=el.play();if(pr&&pr.catch)pr.catch(()=>{});}
+  else [[392,0,.42],[330,.45,.42],[262,.9,.42],[196,1.35,1.6]].forEach(([f,at,t])=>{tone({f,f2:at>1?f*.94:null,t,type:'triangle',v:.34,at:at+.3,attack:.02});tone({f:f/2,t,type:'sine',v:.22,at:at+.3,attack:.03});});
+  setTimeout(()=>{MUS.duck=1;if(MUS.play)musicFadeTo(MUS.play,MUSIC_VOL,2.5);},5200);}
 
 // ---------------- Three.js Grundgerüst ----------------
 const canvas=$('#gl');
@@ -1722,7 +1658,7 @@ const GEARS=[3,2,1,0,-1],GF={3:1,2:.66,1:.33,0:0,'-1':-.3};let gearIdx=3,wheelDe
 let werftHarbor=0;
 
 const AREA_OF={sea:'sea',sinking:'sea',harbor:'harbor',werft:'werft',kran:'kran',tauch:'tauch'};
-function setMode(m){if(AREA_OF[m]&&AREA_OF[m]!==AREA_OF[mode])resetViews();mode=m;if(m!=='sea'&&m!=='sinking'){const db=document.getElementById('diveBtn');if(db)db.hidden=true;}if(typeof setGearMenu==='function'&&gearMenu)setGearMenu(false);if(m==='werft')musicMode('werft');else if(m==='sea'||m==='harbor')musicMode('sea');$('#hud').hidden=m!=='sea'&&m!=='sinking'&&m!=='harbor';if(m!=='harbor')$('#exitSea').hidden=true;$('#werftUI').hidden=m!=='werft';$('#kranUI').hidden=m!=='kran';$('#diveUI').hidden=m!=='tauch';if(m==='kran')musicMode('sea');}
+function setMode(m){if(AREA_OF[m]&&AREA_OF[m]!==AREA_OF[mode])resetViews();mode=m;if(m!=='sea'&&m!=='sinking'){const db=document.getElementById('diveBtn');if(db)db.hidden=true;}if(typeof setGearMenu==='function'&&gearMenu)setGearMenu(false);if(MODE_AREA[m])musicMode(m);$('#hud').hidden=m!=='sea'&&m!=='sinking'&&m!=='harbor';if(m!=='harbor')$('#exitSea').hidden=true;$('#werftUI').hidden=m!=='werft';$('#kranUI').hidden=m!=='kran';$('#diveUI').hidden=m!=='tauch';}
 function enterWerft(hi,afterSink){werftHarbor=hi;save.lastHarbor=hi;setMode('werft');rebuildWerftShip();renderTabs();persist();
   if(afterSink)openChoice();}
 function leaveWerft(){if(seaShip){seaScene.remove(seaShip.group);harborScene.remove(seaShip.group);disposeTree(seaShip.group);}cargoToTops(werftHarbor);seaShip=shipMerge(buildShip(design));addCaptain(seaShip,myOutfit());enterHarbor(werftHarbor,'werft');}
@@ -1807,7 +1743,7 @@ function updateSea(dt,t){const st=seaShip.stats,L=st.L;steerBoat(dt,(x,z,h)=>shi
 function arriveHarbor(i){const fresh=!visited.has(i);visited.add(i);save.lastHarbor=i;world.harbors[i].flag.material.color.set('#3fbf6a');world.harbors[i].check.visible=true;unlock('hafen'+i);
   if(fresh){cheer('🎉');SFX.jubel();}else SFX.ping();
   if(world.harbors.length&&visited.size>=world.harbors.length)unlock('welt');persist();}
-function sink(hz){unlock('haz_'+hz.t);setMode('sinking');boat.sinkT=0;boat.v=0;hornOff();SFX.bonk();if(hz.t==='mine'){cheer('💥');}
+function sink(hz){unlock('haz_'+hz.t);setMode('sinking');musicSink();boat.sinkT=0;boat.v=0;hornOff();SFX.bonk();if(hz.t==='mine'){cheer('💥');}
   boat.sinkKind=sinkKindFor(hz.t);boat.sinkSd=Math.random()<.5?-1:1;OWN_SINK_W=addWreck(boat.x,boat.z,boat.h,design,true,boat.sinkKind);if(boat.sinkKind==='bruch'){spawnBreak(design,boat.x,boat.z,boat.h);seaShip.group.visible=false;}if(seaShip.cap)seaShip.cap.m.g.visible=false;const R=spawnRescue(seaShip,boat.x,boat.z,boat.h,myOutfit(),design,false,true);$('#sinkBtn').hidden=true;SINKBTN.p=null;
   persist();}
 let blubbT=0;
