@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"><meta name="theme-color" content="#2f8fd0"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
-<script>window.KW_APP=1;window.KW_BUILD={"v": "68", "t": "13.11.2026, 12:58 Uhr"};</script>
+<script>window.KW_APP=1;window.KW_BUILD={"v": "69", "t": "13.11.2026, 13:05 Uhr"};</script>
 <title>Kleine Werft</title>
 <style>@font-face{font-family:"Fredoka";src:url("fonts/Fredoka.ttf") format("truetype");font-weight:300 700;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype");font-weight:700;font-display:swap}</style>
 <style>
@@ -146,6 +146,12 @@ button{font-family:inherit;color:inherit}
 #start .boat{font-size:140px;animation:rock 2.4s ease-in-out infinite;display:block;text-align:center}
 @keyframes rock{50%{transform:rotate(-6deg) translateY(-8px)}}
 #start{overflow:auto}
+#quitBtn{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));width:84px;height:84px;padding:0;border:none;background:none;z-index:91;cursor:pointer;touch-action:none;filter:drop-shadow(0 5px 0 rgba(0,0,0,.18))}
+#quitBtn svg{width:100%;height:100%;display:block}#quitBtn.hold{transform:scale(1.08)}
+#byeScreen{position:fixed;inset:0;z-index:300;background:linear-gradient(#0b1a33 0 60%,#10305a 60%);display:grid;place-items:center}
+#byeScreen .byeIn{position:relative;width:320px;height:240px}#byeScreen .moon{position:absolute;right:10px;top:0;font-size:70px}
+#byeScreen .ship{position:absolute;left:70px;bottom:20px;font-size:120px;opacity:.85}#byeScreen .zz{position:absolute;left:200px;bottom:120px;font-size:48px;animation:zz 3s ease-in-out infinite}
+@keyframes zz{50%{transform:translate(8px,-10px);opacity:.6}}
 #verInfo{position:fixed;left:calc(16px + env(safe-area-inset-left,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));font:600 15px var(--font-ui,system-ui),sans-serif;color:rgba(255,255,255,.82);pointer-events:none;z-index:91;text-shadow:0 1px 2px rgba(20,40,70,.55)}
 .startwrap{display:flex;flex-direction:column;align-items:center;gap:18px;padding:24px 16px}
 #start .boat{font-size:110px}
@@ -269,7 +275,13 @@ textarea.dump{width:100%;height:120px;font:12px ui-monospace,monospace}
 <div id="start">
   <div class="startwrap"><span class="boat">🚢</span><div id="profiles"></div><small>Kleine Werft · Prototyp · Ton an</small></div>
   <div id="verInfo" aria-label="Version"></div>
+  <button id="quitBtn" aria-label="App schließen (3 Sekunden gedrückt halten)"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#fff"/>
+    <circle id="quitRing" cx="50" cy="50" r="46" fill="none" stroke="#e8473c" stroke-width="7" stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="289" transform="rotate(-90 50 50)"/>
+    <rect x="31" y="22" width="38" height="58" rx="3" fill="#7a4a21" stroke="#22314a" stroke-width="4"/><path d="M36 26h22v50H36z" fill="#a8683a" stroke="#22314a" stroke-width="3"/>
+    <rect x="40" y="31" width="14" height="16" rx="2" fill="#c98a52"/><rect x="40" y="52" width="14" height="18" rx="2" fill="#c98a52"/><circle cx="54" cy="52" r="3.2" fill="#ffd23f" stroke="#22314a" stroke-width="1.5"/>
+    <path d="M24 80h52" stroke="#22314a" stroke-width="4" stroke-linecap="round"/></svg></button>
 </div>
+<div id="byeScreen" hidden><div class="byeIn"><span class="moon">🌙</span><span class="ship">🚢</span><span class="zz">💤</span></div></div>
 
 <div id="editor" hidden>
   <aside>
@@ -448,7 +460,7 @@ function hornOff(){if(!hornNodes)return;const {g,os}=hornNodes;g.gain.linearRamp
 const NOTE_IDX={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
 function nf(n){if(n==='R')return 0;const m=n.match(/^([A-G](?:#|b)?)(\d)$/);return m?440*Math.pow(2,(NOTE_IDX[m[1]]+12*(+m[2]+1)-69)/12):0;}
 // ---------------- Version & Update-Stand (Startbildschirm unten links, Elternbereich) ----------------
-/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "68", "t": "13.11.2026, 12:53 Uhr", "test": 1};/*KW_BUILD_END*/
+/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "69", "t": "13.11.2026, 13:05 Uhr", "test": 1};/*KW_BUILD_END*/
 const UPD={state:null,v:null,pct:0};
 function verText(){const B=window.KW_BUILD||{};let s=(B.test?'Test · ':'')+'Version '+B.v+(B.t?' · '+B.t:'');
   if(UPD.state==='first')s+=' · Offline-Speicher ⬇ '+UPD.pct+' %';else if(UPD.state==='firstdone')s+=' · offline bereit ✓';
@@ -463,6 +475,17 @@ if('serviceWorker' in navigator&&window.KW_APP){
     else if(d.type==='kw-version'&&d.v&&d.v!==(window.KW_BUILD||{}).v){UPD.state='ready';UPD.v=d.v;showVer();}});
   navigator.serviceWorker.getRegistration().then(r=>{if(r&&r.waiting)r.waiting.postMessage({type:'kw-version?'});}).catch(()=>{});}
 setTimeout(showVer,0);
+// ---------------- Tür-Knopf: 3 Sekunden halten = App schließen ----------------
+(function(){const btn=document.getElementById('quitBtn'),ring=document.getElementById('quitRing');if(!btn)return;const HOLD=3000,LEN=289;let t0=0,raf=0,pid=null;
+  const reset=()=>{cancelAnimationFrame(raf);raf=0;pid=null;btn.classList.remove('hold');ring.style.strokeDashoffset=LEN;};
+  const quit=()=>{reset();try{audioInit();}catch(e){}try{tone({f:180,f2:90,t:.25,type:'triangle',v:.5});noise(.12,.35,600,.18);tone({f:110,t:.18,type:'sine',v:.5,at:.2});}catch(e){}
+    try{persist();}catch(e){}try{musicStop();}catch(e){}
+    setTimeout(()=>{try{window.close();}catch(e){}setTimeout(()=>{if(!window.closed){document.getElementById('byeScreen').hidden=false;try{if(document.fullscreenElement)document.exitFullscreen();}catch(e){}}},350);},450);};
+  const step=()=>{const k=Math.min(1,(performance.now()-t0)/HOLD);ring.style.strokeDashoffset=LEN*(1-k);if(k>=1){quit();return;}raf=requestAnimationFrame(step);};
+  btn.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();pid=e.pointerId;try{btn.setPointerCapture(pid);}catch(err){}t0=performance.now();btn.classList.add('hold');raf=requestAnimationFrame(step);});
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>btn.addEventListener(ev,e=>{if(raf)reset();}));
+  btn.addEventListener('contextmenu',e=>e.preventDefault());
+  document.getElementById('byeScreen').addEventListener('click',()=>location.reload());})();
 
 // ---------------- Musik aus Dateien (ADR-2026-11-13b) ----------------
 // Playlists je Bereich; die Liste erzeugt das Musik-Skript aus den Ordnern werft/meer/kran/tauchen/untergang.
