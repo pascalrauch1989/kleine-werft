@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"><meta name="theme-color" content="#2f8fd0"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
-<script>window.KW_APP=1;window.KW_VERSION="67";</script>
+<script>window.KW_APP=1;window.KW_BUILD={"v": "68", "t": "13.11.2026, 12:53 Uhr"};</script>
 <title>Kleine Werft</title>
 <style>@font-face{font-family:"Fredoka";src:url("fonts/Fredoka.ttf") format("truetype");font-weight:300 700;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype");font-weight:700;font-display:swap}</style>
 <style>
@@ -146,6 +146,7 @@ button{font-family:inherit;color:inherit}
 #start .boat{font-size:140px;animation:rock 2.4s ease-in-out infinite;display:block;text-align:center}
 @keyframes rock{50%{transform:rotate(-6deg) translateY(-8px)}}
 #start{overflow:auto}
+#verInfo{position:fixed;left:calc(16px + env(safe-area-inset-left,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));font:600 15px var(--font-ui,system-ui),sans-serif;color:rgba(255,255,255,.82);pointer-events:none;z-index:91;text-shadow:0 1px 2px rgba(20,40,70,.55)}
 .startwrap{display:flex;flex-direction:column;align-items:center;gap:18px;padding:24px 16px}
 #start .boat{font-size:110px}
 #profiles{display:flex;flex-wrap:wrap;gap:22px;justify-content:center;max-width:960px}
@@ -267,6 +268,7 @@ textarea.dump{width:100%;height:120px;font:12px ui-monospace,monospace}
 
 <div id="start">
   <div class="startwrap"><span class="boat">🚢</span><div id="profiles"></div><small>Kleine Werft · Prototyp · Ton an</small></div>
+  <div id="verInfo" aria-label="Version"></div>
 </div>
 
 <div id="editor" hidden>
@@ -445,6 +447,23 @@ function hornOff(){if(!hornNodes)return;const {g,os}=hornNodes;g.gain.linearRamp
 // ---------- Musik: Werft-Lied + Seefahrer-Playlist (traditionelle, gemeinfreie Melodien, nur Töne) ----------
 const NOTE_IDX={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
 function nf(n){if(n==='R')return 0;const m=n.match(/^([A-G](?:#|b)?)(\d)$/);return m?440*Math.pow(2,(NOTE_IDX[m[1]]+12*(+m[2]+1)-69)/12):0;}
+// ---------------- Version & Update-Stand (Startbildschirm unten links, Elternbereich) ----------------
+/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "68", "t": "13.11.2026, 12:53 Uhr", "test": 1};/*KW_BUILD_END*/
+const UPD={state:null,v:null,pct:0};
+function verText(){const B=window.KW_BUILD||{};let s=(B.test?'Test · ':'')+'Version '+B.v+(B.t?' · '+B.t:'');
+  if(UPD.state==='first')s+=' · Offline-Speicher ⬇ '+UPD.pct+' %';else if(UPD.state==='firstdone')s+=' · offline bereit ✓';
+  else if(UPD.state==='load')s+=' · Update '+UPD.v+' ⬇ '+UPD.pct+' %';else if(UPD.state==='ready')s+=' · Update '+UPD.v+' bereit (nächster Start)';return s;}
+function verParents(){const B=window.KW_BUILD||{};const cur=(B.test?'Testversion ':'Version ')+B.v+(B.t?' vom '+B.t:'');
+  const u=UPD.state==='load'?'Neue Version '+UPD.v+' wird geladen: '+UPD.pct+' %':UPD.state==='ready'?'Neue Version '+UPD.v+' ist bereit – wird beim nächsten Start aktiv':UPD.state==='first'?'Offline-Speicher wird gefüllt: '+UPD.pct+' %':UPD.state==='firstdone'?'Alles offline gespeichert':(window.KW_APP?'Keine neue Version (prüft bei Internet automatisch)':'Claude-Link: immer die neueste Testversion');
+  return {cur,u};}
+function showVer(){const el=document.getElementById('verInfo');if(el)el.textContent=verText();const p=document.getElementById('pVerU');if(p){const v=verParents();p.textContent=v.u;}}
+if('serviceWorker' in navigator&&window.KW_APP){
+  navigator.serviceWorker.addEventListener('message',e=>{const d=e.data||{};if(d.type==='kw-progress'){const first=!navigator.serviceWorker.controller;UPD.state=first?'first':'load';UPD.v=d.v;UPD.pct=Math.min(99,Math.floor(d.done/Math.max(1,d.total)*100));showVer();}
+    else if(d.type==='kw-installed'){const first=!navigator.serviceWorker.controller||d.v===(window.KW_BUILD||{}).v;UPD.state=first?'firstdone':'ready';UPD.v=d.v;UPD.pct=100;showVer();}
+    else if(d.type==='kw-version'&&d.v&&d.v!==(window.KW_BUILD||{}).v){UPD.state='ready';UPD.v=d.v;showVer();}});
+  navigator.serviceWorker.getRegistration().then(r=>{if(r&&r.waiting)r.waiting.postMessage({type:'kw-version?'});}).catch(()=>{});}
+setTimeout(showVer,0);
+
 // ---------------- Musik aus Dateien (ADR-2026-11-13b) ----------------
 // Playlists je Bereich; die Liste erzeugt das Musik-Skript aus den Ordnern werft/meer/kran/tauchen/untergang.
 /*KW_MUSIC_START*/window.KW_MUSIC={"werft":["musik/werft/1-werft-1.mp3"],"meer":["musik/meer/1-rolling-deckside-1.mp3","musik/meer/2-rolling-deckside-2.mp3","musik/meer/3-rolling-deckside-3.mp3","musik/meer/4-rolling-deckside-4.mp3"],"kran":["musik/kran/1-rolling-deckside-x-rolling-deckside-mashup.mp3"],"tauchen":["musik/tauchen/1-diving.mp3"],"untergang":[]};/*KW_MUSIC_END*/
@@ -2931,6 +2950,7 @@ function openParents(back){
     <div class="prow"><label for="pHaz">Gefahren auf der Karte<br><small style="font-weight:400">Eisberge, Seeminen und Riffe · 0 % = keine</small></label><span style="display:flex;align-items:center;gap:10px"><input type="range" id="pHaz" min="0" max="100" step="10" value="${save.hazardPct??100}"><b id="pHazV" style="width:48px;text-align:right;font-variant-numeric:tabular-nums">${save.hazardPct??100} %</b></span></div>
     <div class="prow"><span><b>Spielstand</b><br><small>${ownedCount()} von ${allStickers().length} Stickern · ${visited.size} von ${world?world.harbors.length:0} Häfen</small></span><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="pbtn" id="pSave">Sichern</button><label class="pbtn alt" for="pLoad">Laden</label><input type="file" id="pLoad" accept=".json,application/json" hidden><button class="pbtn danger" id="pReset">Zurücksetzen</button></span></div>
     <div class="prow"><span><b>Karte</b><br><small>${MAP&&MAP.stamp?'Veröffentlicht am '+new Date(MAP.stamp).toLocaleString('de-DE'):'Standardkarte'}</small></span><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="pbtn alt" id="pFetch">Neue Karte holen</button><button class="pbtn alt" id="pEditor">Karten-Editor</button></span></div>
+    <div class="prow"><span><b>App-Version</b><br><small id="pVerC">${verParents().cur}</small><br><small id="pVerU">${verParents().u}</small></span></div>
     <div class="pmsg" id="pMsg" role="status"></div><div id="pDump"></div></div></div>`;
   $('#mClose').onclick=()=>{closeModal();if(back&&!document.querySelector('#modalRoot .modal'))back();};
   $('#pMusic').onchange=e=>{save.music=e.target.checked;persist();if(save.music)musicStart();else musicStop();};
