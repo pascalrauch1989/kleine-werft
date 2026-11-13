@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"><meta name="theme-color" content="#2f8fd0"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
-<script>window.KW_APP=1;window.KW_BUILD={"v": "72", "t": "13.11.2026, 13:46 Uhr"};</script>
+<script>window.KW_APP=1;window.KW_BUILD={"v": "73", "t": "13.11.2026, 13:55 Uhr"};</script>
 <title>Kleine Werft</title>
 <style>@font-face{font-family:"Fredoka";src:url("fonts/Fredoka.ttf") format("truetype");font-weight:300 700;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype");font-weight:700;font-display:swap}</style>
 <style>
@@ -462,7 +462,7 @@ function hornOff(){if(!hornNodes)return;const {g,os}=hornNodes;g.gain.linearRamp
 const NOTE_IDX={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
 function nf(n){if(n==='R')return 0;const m=n.match(/^([A-G](?:#|b)?)(\d)$/);return m?440*Math.pow(2,(NOTE_IDX[m[1]]+12*(+m[2]+1)-69)/12):0;}
 // ---------------- Version & Update-Stand (Startbildschirm unten links, Elternbereich) ----------------
-/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "72", "t": "13.11.2026, 13:46 Uhr", "test": 1};/*KW_BUILD_END*/
+/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "73", "t": "13.11.2026, 13:55 Uhr", "test": 1};/*KW_BUILD_END*/
 const UPD={state:null,v:null,pct:0};
 function verText(){const B=window.KW_BUILD||{};let s=(B.test?'Test · ':'')+'Version '+B.v+(B.t?' · '+B.t:'');
   if(UPD.state==='first')s+=' · Offline-Speicher ⬇ '+UPD.pct+' %';else if(UPD.state==='firstdone')s+=' · offline bereit ✓';
@@ -673,7 +673,14 @@ IN.rutsche=isoFit(v=>{const P=v.P;let r=v.cyl(0,.35,0,.16,3.2,'#f4f6f8')+v.box(-
   const pl=pts.map(q=>f1(q[0])+','+f1(q[1])).join(' ');return r+`<polyline points="${pl}" fill="none" stroke="#22314a" stroke-width="7" stroke-linejoin="round"/><polyline points="${pl}" fill="none" stroke="#ff7eb6" stroke-width="4.2" stroke-linejoin="round"/>`;});
 IN.auto=isoFit(v=>{const P=v.P;let r=v.box(-1.3,.55,-.6,2.6,.6,1.2,'#e8473c')+v.box(-.75,1.15,-.55,1.4,.55,1.1,'#e8473c')+v.poly([P(-.65,1.2,-.56),P(.55,1.2,-.56),P(.55,1.62,-.56),P(-.65,1.62,-.56)],'#2a3b4f');
   [-.8,.8].forEach(x=>{const c=P(x,.55,-.6);r+=`<circle cx="${f1(c[0])}" cy="${f1(c[1])}" r="${f1(3*v.u)}" fill="#1d2024" stroke-width="1.4"/>`;});return r;});
-['container','container10','kabine','bruecke','boot','kran','radar','mast','treppe','treppe2','balkon','kuppel','pool','rutsche','auto'].forEach(k=>AUF_SVG[k]=ISO(IN[k]));
+IN.heli=isoFit(v=>{const P=v.P,ring=[];for(let k=0;k<=24;k++){const a=k/24*Math.PI*2;ring.push(P(Math.cos(a)*.95,.62,Math.sin(a)*.6));}let r=v.box(-1.3,.35,-.85,2.6,.25,1.7,'#5c636b');
+  r+=`<polyline points="${ring.map(q=>f1(q[0])+','+f1(q[1])).join(' ')}" fill="none" stroke="#ffd23f" stroke-width="3"/>`;[[-.35,-.35,-.35,.35],[.35,-.35,.35,.35],[-.35,0,.35,0]].forEach(([x1,z1,x2,z2])=>r+=v.line(P(x1,.62,z1),P(x2,.62,z2),'#ffffff',3));return r;});
+IN.hubschrauber=isoFit(v=>{const P=v.P;let r=v.line(P(-.9,.4,-.35),P(.7,.4,-.35),'#22314a',2)+v.line(P(-.9,.4,.35),P(.7,.4,.35),'#22314a',2);
+  r+=v.box(-.6,.55,-.4,1.3,.75,.8,'#e8473c')+v.poly([P(.7,.62,-.41),P(.7,1.2,-.41),P(.4,1.3,-.41),P(.4,.62,-.41)],'#7fd3ff')+v.box(-1.9,.95,-.1,1.35,.22,.2,'#e8473c')+v.box(-2,1.0,-.12,.2,.5,.05,'#ffffff');
+  r+=v.line(P(.05,1.3,0),P(.05,1.5,0),'#22314a',2)+v.line(P(-1.2,1.55,-.9),P(1.3,1.55,.9),'#22314a',3)+v.line(P(-1.2,1.55,.9),P(1.3,1.55,-.9),'#22314a',3);return r;});
+IN.galgen=isoFit(v=>{const P=v.P;let r=v.box(-1.3,.35,-.85,2.6,.2,1.7,'#5c636b');[-.7,.7].forEach(z=>{r+=v.line(P(.3,.55,z),P(-.4,3.2,z*.15),'#22314a',8)+v.line(P(.3,.55,z),P(-.4,3.2,z*.15),'#ffd23f',5);});
+  r+=v.line(P(-.4,3.2,-.2),P(-.4,3.2,.2),'#ffd23f',6)+v.line(P(-.4,3.2,0),P(-.4,2.0,0),'#22314a',1.6)+v.box(-.6,1.6,-.2,.4,.4,.4,'#ff9f1c');return r;});
+['container','container10','kabine','bruecke','boot','kran','radar','mast','treppe','treppe2','balkon','kuppel','pool','rutsche','auto','heli','hubschrauber','galgen'].forEach(k=>AUF_SVG[k]=ISO(IN[k]));
 ['schornstein','titanic','dampf','modern','doppel'].forEach(k=>FUN_SVG[k]=ISO(IN[k]));
 ['rah','dreieck','spinnaker'].forEach(k=>SAIL_SVG[k]=ISO(IN[k]));
 ['heck','seite_klein','seite_gross'].forEach(k=>WHEEL_SVG[k]=ISO(IN[k]));
@@ -699,10 +706,12 @@ const PLANK_G=`<g ${ISO_S}><path d="M28 52L68 29V36L28 59Z" fill="#b47a3f"/><pat
 const BEAM_SVG=`<svg viewBox="0 0 74 74">${BEAM_G}</svg>`,PLANK_SVG=`<svg viewBox="0 0 74 74">${PLANK_G}</svg>`;
 const MATERIAL_TAB_SVG=`<svg viewBox="0 0 148 74"><g transform="translate(2 2) scale(.95)">${BEAM_G}</g><g transform="translate(74 2) scale(.95)">${PLANK_G}</g></svg>`;
 const MATERIALS={stahl:{icon:BEAM_SVG,hull:'#e8473c',deck:'#c99a63'},holz:{icon:PLANK_SVG,hull:'#9b6234',deck:'#d9b27c'}};
+TAB_ICON.technik=ISO(`<g transform="translate(-6 18) scale(.72)">${IN.kran}</g><g transform="translate(22 2) scale(.7)">${IN.hubschrauber}</g>`);
 TAB_ICON.frei=ISO(`<g transform="translate(-4 16) scale(.8)">${IN.pool}</g><g transform="translate(30 -4) scale(.62)">${IN.rutsche}</g>`);
 const TOPS={
   container:{h:2.6,stack:true,icon:AUF_SVG.container,span:2},container10:{h:2.6,stack:true,icon:AUF_SVG.container10},cfill:{h:2.6,stack:true,hidden:true},kabine:{h:2.4,stack:true,icon:AUF_SVG.kabine,c:'#ffffff'},bruecke:{h:2.8,stack:true,icon:AUF_SVG.bruecke,c:'#ffffff'},
-  boot:{h:1.7,stack:false,icon:AUF_SVG.boot,c:'#ff8a1f'},kran:{h:6,stack:false,icon:AUF_SVG.kran},radar:{h:4,stack:false,icon:AUF_SVG.radar},mast:{h:15,stack:false,icon:AUF_SVG.mast,c:'#c9a36b'},treppe:{h:.02,stack:false,stair:1,icon:AUF_SVG.treppe,c:'#8f9aa5'},treppe2:{h:.02,stack:false,stair:2,icon:AUF_SVG.treppe2,c:'#8f9aa5'},
+  boot:{h:1.7,stack:false,icon:AUF_SVG.boot,c:'#ff8a1f'},kran:{h:6,tab:'technik',stack:false,icon:AUF_SVG.kran},radar:{h:4,tab:'technik',stack:false,icon:AUF_SVG.radar},mast:{h:15,tab:'technik',stack:false,icon:AUF_SVG.mast,c:'#c9a36b'},
+  heli:{h:.35,tab:'technik',stack:true,icon:AUF_SVG.heli,c:'#5c636b'},hubschrauber:{h:2.2,tab:'technik',stack:false,icon:AUF_SVG.hubschrauber,c:'#e8473c'},galgen:{h:6.5,tab:'technik',stack:false,icon:AUF_SVG.galgen,c:'#ffd23f'},treppe:{h:.02,stack:false,stair:1,icon:AUF_SVG.treppe,c:'#8f9aa5'},treppe2:{h:.02,stack:false,stair:2,icon:AUF_SVG.treppe2,c:'#8f9aa5'},
   schornstein:{h:4.5,stack:false,tab:'schorn',icon:FUN_SVG.schornstein,c:'#e8473c'},
   titanic:{h:6.5,stack:false,tab:'schorn',icon:FUN_SVG.titanic,c:'#d9a441'},
   dampf:{h:5.5,stack:false,tab:'schorn',icon:FUN_SVG.dampf,c:'#3a3f47'},
@@ -796,6 +805,17 @@ function topMesh(it,cw,anim){
     [[col,1.15,2.5,0],['#ffd23f',1.45,-1.8,Math.PI]].forEach(([c,r,n,ph])=>{const pts=[];for(let k=0;k<=24;k++){const a=ph+k/24*n*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*r,6.2-k/24*5.7,Math.sin(a)*Math.min(r,dz/2)));}
       g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),48,.32,6,false),mat(c)));});}
   else if(T==='auto'){const cols=[it.c||'#e8473c','#ffd23f','#2f8fd0','#3fbf6a','#ffffff'],n=dz>=2.9?2:1;for(let k=0;k<n;k++){const car=mkCar(cols[k?1+((it.c||'').length+k)%4:0]);car.scale.setScalar(.62);car.position.z=n>1?(k?1:-1)*dz/4:0;g.add(car);}}
+  else if(T==='heli'){g.add(box(2.95,.3,dz,it.c||'#5c636b',0,.15,0));const rg=new THREE.Mesh(new THREE.RingGeometry(Math.min(1.25,dz*.42)-.14,Math.min(1.25,dz*.42),28),mat('#ffd23f',{side:THREE.DoubleSide}));rg.rotation.x=-Math.PI/2;rg.position.y=.32;g.add(rg);
+    [[-.38,0,.12,.9],[.38,0,.12,.9],[0,0,.76,.12]].forEach(([x,z,w,d])=>g.add(box(w,.04,d,'#ffffff',x,.33,z)));[-1,1].forEach(sd=>g.add(box(2.95,.06,.08,'#ffffff',0,.32,sd*(dz/2-.06))));}
+  else if(T==='hubschrauber'){const H=new THREE.Group(),col=it.c||'#e8473c';g.add(H);H.userData.heli=1;anim.push(H);
+    [-1,1].forEach(sd=>{H.add(box(1.8,.08,.08,'#22314a',.05,.08,sd*.42));H.add(box(.08,.3,.08,'#22314a',.4,.22,sd*.42));H.add(box(.08,.3,.08,'#22314a',-.4,.22,sd*.42));});
+    const body=new THREE.Mesh(new THREE.SphereGeometry(.62,12,10),mat(col));body.scale.set(1.25,.85,.8);body.position.set(.15,.85,0);H.add(body);
+    const glas=new THREE.Mesh(new THREE.SphereGeometry(.5,10,8),mat('#7fd3ff'));glas.scale.set(.9,.8,.85);glas.position.set(.55,.95,0);H.add(glas);
+    H.add(box(1.5,.22,.2,col,-1.05,1.0,0));H.add(box(.12,.5,.06,'#ffffff',-1.8,1.15,0));const tr=box(.04,.6,.08,'#22314a',-1.8,1.15,.08);tr.userData.spinZ=25;anim.push(tr);H.add(tr);
+    H.add(box(.1,.25,.1,'#22314a',.15,1.45,0));const rot=new THREE.Group();rot.position.set(.15,1.6,0);[0,Math.PI/2].forEach(a=>{const bl=box(3.2,.04,.16,'#22314a',0,0,0);bl.rotation.y=a;rot.add(bl);});rot.userData.spinY=4;rot.userData.rotor=1;anim.push(rot);H.add(rot);H.userData.rotorG=rot;}
+  else if(T==='galgen'){g.add(box(2.95,.2,dz,'#5c636b',0,.1,0));const yl=it.c||'#ffd23f',hz=dz/2-.25;
+    [-1,1].forEach(sd=>{const leg=new THREE.Mesh(new THREE.BoxGeometry(.35,6.6,.35),mat(yl));leg.position.set(-.6,3.25,sd*hz*.55);leg.rotation.set(sd*.2,0,.22);g.add(leg);});
+    g.add(box(.45,.45,dz*.5,yl,-1.35,6.35,0));g.add(box(.06,2.6,.06,'#22314a',-1.6,4.9,0));g.add(box(.7,.7,.7,'#ff9f1c',-1.6,3.4,0));g.add(box(.5,.5,.5,'#22314a',.6,.45,0));}
   else if(T==='radar'){const m=new THREE.Mesh(new THREE.CylinderGeometry(.15,.2,3.4,6),mat('#ffffff'));m.position.y=1.7;g.add(m);const bar=box(2.2,.25,.4,'#22314a',0,3.6,0);bar.userData.spinY=2.2;anim.push(bar);g.add(bar);}
   return g;
 }
@@ -873,8 +893,12 @@ function buildShip(d){
   const walk=walkInfo(d,Ly);walk.ladders.forEach(Lr=>body.add(ladderMesh(Lr,wood)));walk.stairs.forEach(S=>{const m=stairMesh(S,Ly);tagAll(m,{kind:'top',key:S.a+','+S.c,level:S.lv});body.add(m);});
   return {group:g,pivot,body,anim,Ly,L,W,cols,M,ls,lb,cx,stats:shipStats(d,L),walk,topY:FREEBOARD+topMax+1.5};
 }
+const R_SAFE=v=>isFinite(v)?v:0;
 function animShip(s,t){if(s.cap){const dt=Math.min(.1,Math.max(0,t-(s.capT??t)));s.capT=t;capStep(s.cap,dt,t);}s.anim.forEach(o=>{const u=o.userData;
   if(u.spinX)o.rotation.x+=u.spinX*.016;if(u.spinY)o.rotation.y+=u.spinY*.016;if(u.spinZ)o.rotation.z+=u.spinZ*.016;
+  if(u.heli){const st=s.standT||0,cyc=st>10?(st-10)%26:99;let y=0,x=0,z=0,ry=0,fly=false;
+    if(cyc<19){fly=true;const up=Math.min(1,cyc/2.5),down=cyc>16?Math.max(0,(19-cyc)/3):1,hgt=7*Math.min(up,down),R=cyc>2.5&&cyc<16?Math.min(1,(cyc-2.5)/2,(16-cyc)/2)*11:0,a=(cyc-2.5)*.55;x=Math.cos(a)*R-R;z=Math.sin(a)*R;y=hgt;ry=-a-Math.PI/2*(R>0?1:0);}
+    o.position.set(x,y,z);o.rotation.set(0,R_SAFE(ry),fly?Math.sin(t*2)*.05:0);if(u.rotorG)u.rotorG.userData.spinY=fly?28:(st>8?14:4);}
   if(u.wave)o.rotation.y=Math.sin(t*5)*.25;if(u.bobY!==undefined)o.position.y=.06+Math.abs(Math.sin(t*3+o.position.x))*.15;
   if(u.smoke!==undefined){const p=(t*.32+u.smoke/6)%1;o.position.set((u.sx||0)-p*3.2,(u.sy||4.8)+p*6.5,Math.sin(t*1.3+u.smoke)*.35*p);o.scale.setScalar(.45+p*1.7);o.material.opacity=.32*Math.sin(Math.PI*Math.min(1,p*1.15));}});}
 
@@ -1508,7 +1532,7 @@ const AI_DESIGNS={
 };
 const AI_ROUTES=[['faehre',0,1],['kutter',2,3],['frachter',4,10],['segler',3,7],['raddampfer',1,6],['pirat',7,8],['schlepper',9,11],['dampfer',5,2],['faehre2',0,11],['kutter2',6,8],['segler2',2,9],['frachter2',10,0],
   // berühmte Schiffe (Vorlagen aus dem Schiffsbuch) auf langen Routen
-  ['titanic',0,8],['icon',1,10],['moby',3,5],['qm2',4,9],['evergiven',11,7],['gorchfock',6,1],['santamaria',9,3],['seenot',5,0]];
+  ['titanic',0,8],['icon',1,10],['moby',3,5],['qm2',4,9],['evergiven',11,7],['gorchfock',6,1],['santamaria',9,3],['seenot',5,0],['polarstern',4,5]];
 AI_DESIGNS.faehre2=Object.assign(clone(AI_DESIGNS.faehre),{hull:'#ffd23f'});AI_DESIGNS.kutter2=Object.assign(clone(AI_DESIGNS.kutter),{hull:'#3fbf6a',horn:'ente'});
 AI_DESIGNS.segler2=Object.assign(clone(AI_DESIGNS.segler),{hull:'#c98f52',sails:[{t:'spinnaker',ax:3,c:'#fff'},{t:'dreieck',ax:6,c:'#fffaf0'}]});AI_DESIGNS.frachter2=Object.assign(clone(AI_DESIGNS.frachter),{hull:'#2f8fd0',horn:'kutter'});
 function waterGrid(hazards){const B=new Uint8Array(N*N);
@@ -1546,8 +1570,9 @@ function updateAI(dt,t){const fx=Math.cos(boat.h),fz=-Math.sin(boat.h);
         if(side<160&&clearLine(a.x,a.z,boat.x,boat.z))tg={x:boat.x+fx*25-fz*32,z:boat.z+fz*25+fx*32};else{let p=V.path[Math.min(V.pi,V.path.length-1)];if(Math.hypot(p.x-a.x,p.z-a.z)<16&&V.pi<V.path.length-1){V.pi++;p=V.path[V.pi];}tg=p;}speed=st.vmax*.75;if(side<55){V.phase='begleiten';V.t=14;aiHorn(a,.8,true);a.greet=30;}if(V.t<=0)V.phase='zurueck';}
       else if(V.phase==='begleiten'){tg={x:boat.x+fx*(12+Math.abs(boat.v)*2)-fz*30,z:boat.z+fz*(12+Math.abs(boat.v)*2)+fx*30};speed=clamp(Math.abs(boat.v)*1.15+1,1.5,st.vmax*.8);if(V.t<=0)V.phase='zurueck';}
       else{const c=V.crumbs[V.crumbs.length-1];tg=c;if(Math.hypot(a.x-c.x,a.z-c.z)<15){V.crumbs.pop();if(!V.crumbs.length)a.visit=null;}}}
+    a.sh.standT=Math.abs(a.v)<.4?(a.sh.standT||0)+dt:0;
     if(!tg){if(a.wait>0){a.wait-=dt;speed=0;}
-      else{tg=a.path[a.i];if(Math.hypot(tg.x-a.x,tg.z-a.z)<14){a.i+=a.dir;if(a.i>=a.path.length||a.i<0){a.dir*=-1;a.i=clamp(a.i+a.dir*2,0,a.path.length-1);a.wait=7+Math.random()*4;}tg=a.path[clamp(a.i,0,a.path.length-1)];}}}
+      else{tg=a.path[a.i];if(Math.hypot(tg.x-a.x,tg.z-a.z)<14){a.i+=a.dir;if(a.i>=a.path.length||a.i<0){a.dir*=-1;a.i=clamp(a.i+a.dir*2,0,a.path.length-1);a.wait=a.id==='polarstern'?34:7+Math.random()*4;}tg=a.path[clamp(a.i,0,a.path.length-1)];}}}
     if(tg){// Gefahren großräumig umfahren
       let tx=tg.x,tz=tg.z;world.hazards.forEach(h=>{if(!h.active)return;const d=Math.hypot(h.x-a.x,h.z-a.z);if(d<h.r+a.r+22){tx+=(a.x-h.x)/d*40;tz+=(a.z-h.z)/d*40;}});
       let err=Math.atan2(-(tz-a.z),tx-a.x)-a.h;err=Math.atan2(Math.sin(err),Math.cos(err));a.h+=clamp(err,-st.turn*.75*dt,st.turn*.75*dt);if(Math.abs(err)>1)speed*=.4;}
@@ -1773,7 +1798,7 @@ function steerBoat(dt,hit){const st=seaShip.stats,L=st.L;
   const nh=boat.h+boat.turn*dt,fx=Math.cos(nh),fz=-Math.sin(nh),nx=boat.x+fx*boat.v*dt,nz=boat.z+fz*boat.v*dt;
   boat.bonkCD-=dt;
   if(!hit(boat.x,boat.z,boat.h)&&hit(nx,nz,nh)){boat.v*=-.3;if(boat.bonkCD<=0){SFX.bonk();boat.bonkCD=.7;}}else{boat.x=nx;boat.z=nz;boat.h=nh;}}
-function updateSea(dt,t){const st=seaShip.stats,L=st.L;steerBoat(dt,(x,z,h)=>shipHitsLand(x,z,h,L));const fx=Math.cos(boat.h),fz=-Math.sin(boat.h);
+function updateSea(dt,t){const st=seaShip.stats,L=st.L;seaShip.standT=Math.abs(boat.v)<.4?(seaShip.standT||0)+dt:0;steerBoat(dt,(x,z,h)=>shipHitsLand(x,z,h,L));const fx=Math.cos(boat.h),fz=-Math.sin(boat.h);
   pushAI(L);
   // Gefahren
   const bx=boat.x+fx*L/2,bz=boat.z+fz*L/2,sx=boat.x-fx*L/2,sz=boat.z-fz*L/2;
@@ -2587,7 +2612,7 @@ function chooseSpot(P,S,H,state){const off=k=>{const a=k/16*Math.PI*2;return [Ma
 function placeBtnNear(btn,wx,wz,ax,az,state,cam){const pr=(x,y,z)=>{tmpV.set(x,y,z).project(cam||seaCam);return [(tmpV.x+1)/2*innerWidth,(1-tmpV.y)/2*innerHeight];};
   if(!state.p){state.k=null;state.o=null;state.until=0;}const p=chooseSpot(pr(wx,2,wz),pr(boat.x,3,boat.z),pr(ax,6,az),state);btn.style.left=p[0]+'px';btn.style.top=p[1]+'px';}
 const HBTN={anc:{p:null},exit:{p:null}};$('#exitSea').innerHTML=EXIT_SVG;$('#kExit').textContent='⚓';$('#testKran').innerHTML=KRAN_SVG;$('#testKran').onclick=()=>{if(mode!=='werft')return;SFX.plop();leaveWerft();setTimeout(()=>{if(mode==='harbor'&&HB&&HB.kran)enterKran();},60);};
-function updateHarbor(dt,t){const st=seaShip.stats,L=st.L;steerBoat(dt,(x,z,h)=>harborHit(x,z,h,L,seaShip.W));
+function updateHarbor(dt,t){const st=seaShip.stats,L=st.L;seaShip.standT=Math.abs(boat.v)<.4?(seaShip.standT||0)+dt:0;steerBoat(dt,(x,z,h)=>harborHit(x,z,h,L,seaShip.W));
   HB.anims.forEach(f=>f(t));updateHarborWater(t);
   // Werft-Anleger
   let near=null;HB.berths.forEach(b=>{const d=Math.hypot(b.x-boat.x,b.z-boat.z),R=b.r||32;if(d<(HB.near===b?R+10:R))near=b;});const anc=$('#anchor');
@@ -2730,7 +2755,15 @@ TEMPLATES.santamaria=mkTpl({material:'holz',bow:'spitz',stern:'spiegel',mids:3,w
 TEMPLATES.seenot=mkTpl({material:'stahl',bow:'spitz',stern:'flach',mids:3,width:1,hull:'#e8473c',keel:'#22314a',band:'#ffffff',deck:'#c9d3dc',horn:'fanfare'},(d,put)=>{
   for(let c=0;c<2;c++){put(2,c,[{t:'kabine',c:'#ffffff'}]);put(3,c,[{t:'kabine',c:'#ffffff'},{t:'bruecke',c:'#ffffff'}]);put(4,c,[{t:'kabine',c:'#ffffff'}]);}
   put(3,0,['radar']);put(4,1,[{t:'mast',c:'#ffffff'}]);d.boats.push({ax:0,side:-1,c:'#ff8a1f'},{ax:0,side:1,c:'#ff8a1f'});d.deko.push({id:'ring',ax:1,side:-1},{id:'ring',ax:1,side:1},{id:'flagge',at:'heck'});});
-const TEMPLATE_ORDER=['titanic','icon','moby','qm2','evergiven','gorchfock','santamaria','seenot'];
+// Polarstern: Forschungseisbrecher, roter Rumpf, Eisbrecher-Bug, weiße Aufbauten, Hubschrauberdeck mit 2 Hubschraubern, Kräne, Heckgalgen
+TEMPLATES.polarstern=mkTpl({material:'stahl',bow:'eis',stern:'flach',mids:7,width:2,hull:'#d63a2f',keel:'#7a1f1a',band:'#ffffff',deck:'#7d8b98',horn:'ozean'},(d,put)=>{const Wt='#ffffff';
+  put(0,1,[{t:'galgen',c:'#ffd23f'}]);put(1,0,[{t:'container10',c:'#ff9f1c'}]);put(1,2,[{t:'container10',c:'#ffffff'}]);put(2,0,['kran']);put(2,2,['kran']);
+  for(let c=0;c<3;c++){put(4,c,[{t:'kabine',c:Wt},{t:'heli',c:'#5c636b'}]);put(5,c,[{t:'kabine',c:Wt},{t:'heli',c:'#5c636b'}]);}
+  put(5,0,[{t:'hubschrauber',c:'#e8473c'}]);put(5,2,[{t:'hubschrauber',c:'#ff9f1c'}]);
+  for(let ax=6;ax<=11;ax++)for(let c=0;c<3;c++){const st=[{t:'kabine',c:Wt},{t:'kabine',c:Wt}];if(ax>=8)st.push({t:ax===11?'bruecke':'kabine',c:Wt});put(ax,c,st);}
+  put(7,1,[{t:'schornstein',c:'#ffffff'}]);put(9,1,[{t:'mast',c:'#ffffff'}]);put(10,1,['radar']);put(12,1,['kran']);
+  for(let ax=6;ax<=9;ax++)[-1,1].forEach(side=>d.boats.push({ax,side,c:'#ff8a1f'}));d.deko.push({id:'flagge',at:'heck'},{id:'anker',side:-1},{id:'anker',side:1});});
+const TEMPLATE_ORDER=['titanic','icon','moby','qm2','evergiven','gorchfock','santamaria','seenot','polarstern'];
 // ---------------- Schiffsbuch: eigene Schiffe wechseln, Vorlagen nutzen ----------------
 const MAX_SHIPS=12,THUMBS=new Map();
 const BOOK_SVG=`<svg viewBox="0 0 64 64"><rect x="9" y="5" width="46" height="54" rx="6" fill="#2f8fd0" stroke="#22314a" stroke-width="3"/><rect x="9" y="5" width="9" height="54" rx="3" fill="#1f5f94" stroke="#22314a" stroke-width="3"/><path d="M55 54H20" stroke="#fffaf0" stroke-width="3"/>
@@ -2745,7 +2778,7 @@ function deleteShip(k){ensureShips();if(k===save.cur||k<0||k>=save.ships.length)
 function openBook(){SFX.tap();ensureShips();const fresh=!document.querySelector('#modalRoot .bookgrid');if(fresh)openLayer();
   const own=save.ships.map((d,i)=>`<div class="bwrap"><button class="ccard bk${i===save.cur?' cur':''}" data-k="${i}" aria-label="Schiff ${i+1}"><span class="ph">⛵</span>${i===save.cur?'<span class="tick">✅</span>':''}</button>${i===save.cur?'':`<button class="bdel" data-del="${i}" aria-label="Löschen">✕</button>`}</div>`).join('');
   const plus=save.ships.length<MAX_SHIPS?`<button class="ccard plus bk" id="bNew" aria-label="Neues Schiff"><span>+</span></button>`:'';
-  const tpl=TEMPLATE_ORDER.map(id=>`<button class="ccard bk tpl" data-t="${id}" aria-label="${{titanic:'Titanic',icon:'Icon of the Seas',moby:'Moby Zazà',qm2:'Queen Mary 2',evergiven:'Ever Given',gorchfock:'Gorch Fock',santamaria:'Santa Maria',seenot:'Seenotrettungskreuzer'}[id]}"><span class="ph">⛵</span><span class="star">⭐</span></button>`).join('');
+  const tpl=TEMPLATE_ORDER.map(id=>`<button class="ccard bk tpl" data-t="${id}" aria-label="${{titanic:'Titanic',icon:'Icon of the Seas',moby:'Moby Zazà',qm2:'Queen Mary 2',evergiven:'Ever Given',gorchfock:'Gorch Fock',santamaria:'Santa Maria',seenot:'Seenotrettungskreuzer',polarstern:'Polarstern'}[id]}"><span class="ph">⛵</span><span class="star">⭐</span></button>`).join('');
   $('#modalRoot').innerHTML=`<div class="modal"><div class="card"><div class="bookgrid">${own}${plus}</div><div class="bsep"></div><div class="bookgrid">${tpl}</div></div></div>`;
   const root=$('#modalRoot');
   root.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const k=+b.dataset.k;if(k!==save.cur){SFX.jubel();switchShip(k);}else SFX.tap();closeModal();});
@@ -2759,7 +2792,7 @@ $('#shipsBtn').innerHTML=BOOK_SVG;$('#shipsBtn').onclick=openBook;
 // ---------------- Werft: Bedienung ----------------
 // Schiff im Flat Design: Heck (orange), Mittelteil (grün), Bug (blau), leicht getrennt
 const HULL_TAB_SVG=`<svg viewBox="0 0 148 74"><g stroke="#22314a" stroke-width="2.5" stroke-linejoin="round"><path d="M8 22H40V52H20Q9 46 8 22Z" fill="#ff9f1c"/><rect x="45" y="22" width="52" height="30" fill="#3fbf6a"/><path d="M102 22H142L124 52H102Z" fill="#2f8fd0"/></g><path d="M12 30H38M47 30H95M104 30H137" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity=".85"/><path d="M4 62q9-5 18 0t18 0t18 0t18 0t18 0t18 0t18 0t18 0" fill="none" stroke="#7fc4ff" stroke-width="3" stroke-linecap="round"/></svg>`;
-const TABS=[{id:'material',icon:MATERIAL_TAB_SVG},{id:'rumpf',icon:HULL_TAB_SVG},{id:'auf',icon:TAB_ICON.auf},{id:'frei',icon:TAB_ICON.frei},{id:'schorn',icon:TAB_ICON.schorn},{id:'antrieb',icon:TAB_ICON.antrieb},{id:'farbe',icon:'🎨'},{id:'deko',icon:TAB_ICON.deko},{id:'horn',icon:TAB_ICON.horn}];
+const TABS=[{id:'material',icon:MATERIAL_TAB_SVG},{id:'rumpf',icon:HULL_TAB_SVG},{id:'auf',icon:TAB_ICON.auf},{id:'frei',icon:TAB_ICON.frei},{id:'technik',icon:TAB_ICON.technik},{id:'schorn',icon:TAB_ICON.schorn},{id:'antrieb',icon:TAB_ICON.antrieb},{id:'farbe',icon:'🎨'},{id:'deko',icon:TAB_ICON.deko},{id:'horn',icon:TAB_ICON.horn}];
 let curTab='material',undoStack=[];
 function svgPts(pts,{fill='#e8473c',ox=0}={}){const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);const minx=Math.min(...xs,ox),maxx=Math.max(...xs,ox),miny=Math.min(...ys),maxy=Math.max(...ys);const s=Math.min(60/(maxx-minx||1),40/(maxy-miny||1));
   const d=pts.map(([x,y],i)=>(i?'L':'M')+((x-minx)*s+7).toFixed(1)+' '+((y-miny)*s+(50-(maxy-miny)*s)/2).toFixed(1)).join(' ')+'Z';return `<svg viewBox="0 0 74 50"><path d="${d}" fill="${fill}" stroke="#22314a" stroke-width="2.5" stroke-linejoin="round"/></svg>`;}
@@ -2771,6 +2804,7 @@ function trayItems(){const W=7.5;
     ...[0,1,2].map(i=>({type:'width',v:i,html:`<svg viewBox="0 0 74 50"><rect x="8" y="${25-[6,10,15][i]}" width="58" height="${[12,20,30][i]}" rx="4" fill="#9aa8b4" stroke="#22314a" stroke-width="2.5"/></svg>`,on:design.width===i}))];
   if(curTab==='material')return Object.keys(MATERIALS).map(k=>({type:'material',v:k,html:MATERIALS[k].icon,on:design.material===k}));
   if(curTab==='auf')return Object.keys(TOPS).filter(k=>!TOPS[k].tab&&!TOPS[k].hidden).map(k=>({type:'top',v:k,html:TOPS[k].icon}));
+  if(curTab==='technik')return Object.keys(TOPS).filter(k=>TOPS[k].tab==='technik').map(k=>({type:'top',v:k,html:TOPS[k].icon}));
   if(curTab==='frei')return Object.keys(TOPS).filter(k=>TOPS[k].tab==='frei').map(k=>({type:'top',v:k,html:TOPS[k].icon}));
   if(curTab==='schorn')return Object.keys(TOPS).filter(k=>TOPS[k].tab==='schorn').map(k=>({type:'top',v:k,html:TOPS[k].icon}));
   if(curTab==='antrieb')return [{type:'screw',v:'schraube',html:SCREW_SVG,live:design.screw},
