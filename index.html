@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"><meta name="theme-color" content="#2f8fd0"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
-<script>window.KW_APP=1;window.KW_BUILD={"v": "69", "t": "13.11.2026, 13:05 Uhr"};</script>
+<script>window.KW_APP=1;window.KW_BUILD={"v": "70", "t": "13.11.2026, 13:10 Uhr"};</script>
 <title>Kleine Werft</title>
 <style>@font-face{font-family:"Fredoka";src:url("fonts/Fredoka.ttf") format("truetype");font-weight:300 700;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");font-weight:400;font-display:swap}@font-face{font-family:"Atkinson Hyperlegible";src:url("fonts/AtkinsonHyperlegible-Bold.ttf") format("truetype");font-weight:700;font-display:swap}</style>
 <style>
@@ -460,7 +460,7 @@ function hornOff(){if(!hornNodes)return;const {g,os}=hornNodes;g.gain.linearRamp
 const NOTE_IDX={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
 function nf(n){if(n==='R')return 0;const m=n.match(/^([A-G](?:#|b)?)(\d)$/);return m?440*Math.pow(2,(NOTE_IDX[m[1]]+12*(+m[2]+1)-69)/12):0;}
 // ---------------- Version & Update-Stand (Startbildschirm unten links, Elternbereich) ----------------
-/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "69", "t": "13.11.2026, 13:05 Uhr", "test": 1};/*KW_BUILD_END*/
+/*KW_BUILD_START*/window.KW_BUILD=window.KW_BUILD||{"v": "70", "t": "13.11.2026, 13:10 Uhr", "test": 1};/*KW_BUILD_END*/
 const UPD={state:null,v:null,pct:0};
 function verText(){const B=window.KW_BUILD||{};let s=(B.test?'Test · ':'')+'Version '+B.v+(B.t?' · '+B.t:'');
   if(UPD.state==='first')s+=' · Offline-Speicher ⬇ '+UPD.pct+' %';else if(UPD.state==='firstdone')s+=' · offline bereit ✓';
@@ -1776,12 +1776,16 @@ function updateSea(dt,t){const st=seaShip.stats,L=st.L;steerBoat(dt,(x,z,h)=>shi
     if(d<45)unlock('haz_'+hz.t);
     if(d<hz.r+seaShip.W*.42){sink(hz);return;}}
   // Entdeckungen
-  for(const f of world.finds){const fd=FIND_BY_ID[f.id];if(Math.hypot(f.x-boat.x,f.z-boat.z)<(fd&&fd.land?80:55))unlock(f.id);}
+  for(const f of world.finds){const fd=FIND_BY_ID[f.id];if(hullDist(f.x,f.z)<(fd&&fd.land?80:55))unlock(f.id);}
   // Häfen
   let inH=-1;world.harbors.forEach((h,i)=>{if(Math.hypot(h.x-boat.x,h.z-boat.z)<38)inH=i;});
   if(inH>=0&&inH!==boat.harbor){arriveHarbor(inH);}boat.harbor=inH;const anc=$('#anchor');if(inH<0)anc.hidden=true;else if(anc.hidden){anc.hidden=false;ancPos=null;anc.textContent='⚓';anc.dataset.k='';}
-  exploreT-=dt;if(exploreT<=0){exploreT=.2;reveal(boat.x,boat.z,90);}
+  exploreT-=dt;if(exploreT<=0){exploreT=.2;revealHull(90);}
 }
+// Sicht und Entdeckungen vom ganzen Rumpf aus (Linie Heck–Bug), damit lange Schiffe nach vorn genauso weit sehen wie kurze
+function hullAxis(){const hl=Math.max(0,((seaShip&&seaShip.L)||20)/2-2),fx=Math.cos(boat.h),fz=-Math.sin(boat.h);return {hl,fx,fz};}
+function hullDist(px,pz){const {hl,fx,fz}=hullAxis(),dx=px-boat.x,dz=pz-boat.z,t=clamp(dx*fx+dz*fz,-hl,hl);return Math.hypot(dx-fx*t,dz-fz*t);}
+function revealHull(rad){const {hl,fx,fz}=hullAxis(),n=Math.max(1,Math.ceil(2*hl/25));for(let i=0;i<=n;i++){const t=-hl+2*hl*i/n;reveal(boat.x+fx*t,boat.z+fz*t,rad);}}
 function arriveHarbor(i){const fresh=!visited.has(i);visited.add(i);save.lastHarbor=i;world.harbors[i].flag.material.color.set('#3fbf6a');world.harbors[i].check.visible=true;unlock('hafen'+i);
   if(fresh){cheer('🎉');SFX.jubel();}else SFX.ping();
   if(world.harbors.length&&visited.size>=world.harbors.length)unlock('welt');persist();}
